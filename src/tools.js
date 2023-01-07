@@ -21,3 +21,8 @@ export function divideByKey(arr, key) {
         return acc;
     }, {});
 }
+
+export function getAllKeyByIdinObjectArraynoRepeat(arr, key) {
+    const allKey = arr.map((obj) => obj[key]);
+    return [...new Set(allKey)];
+}

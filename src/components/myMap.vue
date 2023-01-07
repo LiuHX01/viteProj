@@ -4,7 +4,7 @@ import * as L from "leaflet";
 import { onMounted } from "vue";
 
 onMounted(() => {
-    const map = L.map("map").setView([51.505, -0.09], 13);
+    const map = L.map("map").setView([34.7109992, 135.46995], 13);
     L.tileLayer("https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}", {
         maxZoom: 19,
     }).addTo(map);
