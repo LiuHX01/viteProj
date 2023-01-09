@@ -1,7 +1,6 @@
-// 将csv格式string转换为object array
 export function csvToArray(str, delimiter = ",") {
-    const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-    const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+    const headers = str.slice(0, str.indexOf("\r")).split(delimiter);
+    const rows = str.slice(str.indexOf("\r") + 1).split("\r");
     const arr = rows.map(function (row) {
         const values = row.split(delimiter);
         const el = headers.reduce(function (object, header, index) {
@@ -13,16 +12,21 @@ export function csvToArray(str, delimiter = ",") {
     return arr;
 }
 
+// return array
 export function divideByKey(arr, key) {
-    return arr.reduce(function (acc, obj) {
-        const property = obj[key];
-        acc[property] = acc[property] || [];
-        acc[property].push(obj);
-        return acc;
-    }, {});
+    const allKey = getAllKeyByIdinObjectArraynoRepeat(arr, key);
+    const res = allKey.map((k) => {
+        return arr.filter((obj) => obj[key] === k);
+    });
+    return res;
 }
+
 
 export function getAllKeyByIdinObjectArraynoRepeat(arr, key) {
     const allKey = arr.map((obj) => obj[key]);
     return [...new Set(allKey)];
+}
+
+export function generatecolor() {
+    return "#" + Math.floor(Math.random() * 0x999999).toString(16);
 }

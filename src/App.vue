@@ -3,21 +3,17 @@
 import myMap from "./components/myMap.vue";
 import myState from "./components/myState.vue";
 import Axios from "axios";
-import { onMounted, watch } from "vue";
-import { csvToArray, divideByKey, getAllKeyByIdinObjectArraynoRepeat } from "./tools.js";
-
-let traceData = {};
-let dataReady = 1;
+import { onMounted, watch, reactive } from "vue";
+import { csvToArray } from "./tools.js";
+import { dataAdaptor } from "./adaptor.js";
 
 const fetchData = async () => {
-    traceData = await Axios.get("/mydata.csv", {
-        responseType: "text",
-    });
-
-    traceData = csvToArray(traceData.data);
-    dataReady = 0;
-    console.log(getAllKeyByIdinObjectArraynoRepeat(traceData, "vehicle_id"));
-    console.log(divideByKey(traceData, "vehicle_id"));
+    for (let i = 1; i <= 2; i++) {
+        const rawData = await Axios.get(`/vdata/${i}.csv`, {
+            responseType: "text",
+        });
+        dataAdaptor.DataEmitter(csvToArray(rawData.data));
+    }
 };
 
 onMounted(() => {
@@ -45,10 +41,10 @@ onMounted(() => {
 .logo:hover {
     filter: drop-shadow(0 0 2em #646cffaa);
 }
-.logo.vue:hover {
+/* .logo.vue:{
     filter: drop-shadow(0 0 2em #42b883aa);
-    /* filter: drop-shadow(0 0 2em #ff7700aa); */
-}
+    /* filter: drop-shadow(0 0 2em #ff7700aa); 
+} */
 
 #mymap {
     width: 1000px;

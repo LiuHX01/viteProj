@@ -79,7 +79,7 @@ button:focus-visible {
   text-align: center;
   width: 100%;
   height: 100%;
-  background-color: #747bff;
+  /* background-color: #747bff; */
 }
 
 @media (prefers-color-scheme: light) {
