@@ -28,5 +28,5 @@ export function getAllKeyByIdinObjectArraynoRepeat(arr, key) {
 }
 
 export function generatecolor() {
-    return "#" + Math.floor(Math.random() * 0x999999).toString(16);
+    return "#" + Math.floor(Math.random() * 0x666666).toString(16);
 }

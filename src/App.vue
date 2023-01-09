@@ -8,8 +8,8 @@ import { csvToArray } from "./tools.js";
 import { dataAdaptor } from "./adaptor.js";
 
 const fetchData = async () => {
-    for (let i = 1; i <= 2; i++) {
-        const rawData = await Axios.get(`/vdata/${i}.csv`, {
+    for (let i = 2; i <= 2; i++) {
+        const rawData = await Axios.get(`/vehicledata/${i}.csv`, {
             responseType: "text",
         });
         dataAdaptor.DataEmitter(csvToArray(rawData.data));
@@ -24,7 +24,7 @@ onMounted(() => {
 <template>
     <div class="container-header"></div>
     <myMap></myMap>
-    <myState></myState>
+    <!-- <myState></myState> -->
 </template>
 
 <style scoped>
