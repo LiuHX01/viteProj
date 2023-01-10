@@ -8,11 +8,11 @@ import { csvToArray } from "./tools.js";
 import { dataAdaptor } from "./adaptor.js";
 
 const fetchData = async () => {
-    for (let i = 2; i <= 2; i++) {
+    for (let i = 1; i <= 5; i++) {
         const rawData = await Axios.get(`/vehicledata/${i}.csv`, {
             responseType: "text",
         });
-        dataAdaptor.DataEmitter(csvToArray(rawData.data));
+        dataAdaptor.DataEmitter([csvToArray(rawData.data), i]);
     }
 };
 
@@ -33,18 +33,6 @@ onMounted(() => {
     height: 50px;
     background-color: aqua;
 }
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-}
-.logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-}
-/* .logo.vue:{
-    filter: drop-shadow(0 0 2em #42b883aa);
-    /* filter: drop-shadow(0 0 2em #ff7700aa); 
-} */
 
 #mymap {
     width: 1000px;
