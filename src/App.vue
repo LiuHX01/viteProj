@@ -1,9 +1,9 @@
 <script setup>
-import myMap from "./components/myMap.vue";
+import myMap from "./components/MainMap.vue";
 import Axios from "axios";
 import { onMounted } from "vue";
-import { csvToArray } from "./tools.js";
-import { dataAdaptor } from "./adaptor.js";
+import { csvToArray } from "./components/Tools.js";
+import { dataAdaptor } from "./components/Adaptor.js";
 
 // fetch data from the server
 const fetchData = async () => {
@@ -28,7 +28,7 @@ onMounted(() => {
 <style scoped>
 .container-header {
     width: 100%;
-    height: 50px;
-    background-color: aqua;
+    height: 5%;
+    background-color: grey;
 }
 </style>

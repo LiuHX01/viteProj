@@ -2,9 +2,10 @@
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { nextTick, onMounted, reactive } from "vue";
-import { dataAdaptor } from "../adaptor.js";
+import { dataAdaptor } from "./Adaptor.js";
 import "l.movemarker";
-import { generateColor } from "../tools";
+import { generateColor } from "./Tools";
+import myState from "./VehicleState.vue";
 
 // array of objects to store the state of each trajectory instance
 const state = reactive([{}]);
@@ -17,25 +18,25 @@ const myIcon = L.icon({
 
 // convert the data to a list of latlng
 const getLatLngList = (data) => {
-    const latlngList = [];
+    const latLngList = [];
     data.forEach((element) => {
-        latlngList.push([Number(element["latitude"]), Number(element["longitude"])]);
+        latLngList.push([Number(element["latitude"]), Number(element["longitude"])]);
     });
-    return latlngList;
+    return latLngList;
 };
 
 // create a new instance of trajectory
-const newInstanceState = (idx, latlngList) => {
+const newInstanceState = (latLngList) => {
     state.push({
         ith: 1,
         instance: L.moveMarker(
-            [latlngList[0], latlngList[1]],
+            [latLngList[0], latLngList[1]],
             { duration: 1000, rotateMarker: true, color: generateColor() },
             { duration: 1000, removeFirstLines: true, icon: myIcon },
             {}
         ),
         timer: null,
-        latlngList: latlngList,
+        latLngList: latLngList,
     });
 };
 
@@ -51,11 +52,11 @@ onMounted(() => {
     // add more lines to the trajectory instance
     const moreLines = (idx) => {
         if (state[idx].ith == 1) {
-            console.log(`trajectory ${idx}`);
-        } else if (state[idx].ith == state[idx].latlngList.length - 1) {
+            console.log(`trajectory ${idx}, length is ${state[idx].latLngList.length}`);
+        } else if (state[idx].ith == state[idx].latLngList.length - 1) {
             clearInterval(state[idx].timer);
         } else {
-            state[idx].instance.addMoreLine(state[idx].latlngList[state[idx].ith], {
+            state[idx].instance.addMoreLine(state[idx].latLngList[state[idx].ith], {
                 animatePolyline: true,
             });
         }
@@ -67,7 +68,7 @@ onMounted(() => {
 
     // listen to the data from the adaptor
     dataAdaptor.DataListener((data) => {
-        newInstanceState(data[1], getLatLngList(data[0]));
+        newInstanceState(getLatLngList(data[0]));
         nextTick(() => {
             state[data[1]].instance.addTo(map);
             moreLines(data[1]);
@@ -77,18 +78,26 @@ onMounted(() => {
 </script>
 
 <template>
-    <div id="map"></div>
+    <div class="map_container">
+        <div id="map"></div>
+        <myState :len="state.length"></myState>
+    </div>
 </template>
 
 <style scoped>
+.map_container {
+    width: 100%;
+    height: 95%;
+    display: inline;
+    float: left;
+    position: relative;
+}
 #map {
     width: 98%;
-    height: 88%;
+    height: 78%;
     margin-top: 1%;
     margin-left: 1%;
     margin-right: 1%;
     margin-bottom: 1%;
-    display: inline;
-    float: left;
 }
 </style>
