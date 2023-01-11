@@ -1,5 +1,5 @@
 <script setup>
-import myMap from "./components/MainMap.vue";
+import MainMap from "./components/MainMap.vue";
 import Axios from "axios";
 import { onMounted } from "vue";
 import { csvToArray } from "./components/Tools.js";
@@ -7,8 +7,8 @@ import { dataAdaptor } from "./components/Adaptor.js";
 
 // fetch data from the server
 const fetchData = async () => {
-    for (let i = 1; i <= 5; i++) {
-        const rawData = await Axios.get(`/vehicledata/${i}.csv`, {
+    for (let i = 0; i < 5; i++) {
+        const rawData = await Axios.get(`/vehicledata/${i + 1}.csv`, {
             responseType: "text",
         });
         dataAdaptor.DataEmitter([csvToArray(rawData.data), i]);
@@ -22,7 +22,7 @@ onMounted(() => {
 
 <template>
     <div class="container-header"></div>
-    <myMap></myMap>
+    <MainMap></MainMap>
 </template>
 
 <style scoped>

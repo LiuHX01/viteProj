@@ -5,10 +5,10 @@ import { nextTick, onMounted, reactive } from "vue";
 import { dataAdaptor } from "./Adaptor.js";
 import "l.movemarker";
 import { generateColor } from "./Tools";
-import myState from "./VehicleState.vue";
+import VehicleState from "./VehicleState.vue";
 
 // array of objects to store the state of each trajectory instance
-const state = reactive([{}]);
+const state = reactive([]);
 
 // icon for the moving marker
 const myIcon = L.icon({
@@ -26,8 +26,9 @@ const getLatLngList = (data) => {
 };
 
 // create a new instance of trajectory
-const newInstanceState = (latLngList) => {
+const newInstanceState = (vehicle_id, latLngList) => {
     state.push({
+        vehicle_id: vehicle_id,
         ith: 1,
         instance: L.moveMarker(
             [latLngList[0], latLngList[1]],
@@ -68,7 +69,7 @@ onMounted(() => {
 
     // listen to the data from the adaptor
     dataAdaptor.DataListener((data) => {
-        newInstanceState(getLatLngList(data[0]));
+        newInstanceState(data[1], getLatLngList(data[0]));
         nextTick(() => {
             state[data[1]].instance.addTo(map);
             moreLines(data[1]);
@@ -80,7 +81,9 @@ onMounted(() => {
 <template>
     <div class="map_container">
         <div id="map"></div>
-        <myState :len="state.length"></myState>
+        <div v-for="item of state">
+            <VehicleState :vehicle_id="item['vehicle_id']" :ith="item['ith']" :len="state.length"></VehicleState>
+        </div>
     </div>
 </template>
 
@@ -93,11 +96,9 @@ onMounted(() => {
     position: relative;
 }
 #map {
-    width: 98%;
+    width: 100%;
     height: 78%;
     margin-top: 1%;
-    margin-left: 1%;
-    margin-right: 1%;
     margin-bottom: 1%;
 }
 </style>
