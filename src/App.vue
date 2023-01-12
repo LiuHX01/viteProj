@@ -21,14 +21,27 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container-header"></div>
-    <MainMap></MainMap>
+    <div class="container">
+        <el-container class="main-container">
+            <el-header height="5%"></el-header>
+            <el-container>
+                <el-main>
+                    <MainMap></MainMap>
+                </el-main>
+                <el-aside width="10%"></el-aside>
+            </el-container>
+        </el-container>
+    </div>
 </template>
 
 <style scoped>
-.container-header {
+.container {
     width: 100%;
-    height: 5%;
-    background-color: grey;
+    height: 100%;
+}
+.main-container {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
 }
 </style>

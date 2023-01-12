@@ -46,9 +46,13 @@ onMounted(() => {
     const map = L.map("map", {
         renderer: L.canvas(),
     }).setView([39.92123, 116.51172], 12);
-    L.tileLayer("https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}", {
+
+    L.tileLayer("https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}", {
         zoom: 12,
     }).addTo(map);
+    /*
+     * 谷歌源 https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}
+     */
 
     // add more lines to the trajectory instance
     const moreLines = (idx) => {
@@ -82,23 +86,44 @@ onMounted(() => {
     <div class="map_container">
         <div id="map"></div>
         <div v-for="item of state">
-            <VehicleState :vehicle_id="item['vehicle_id']" :ith="item['ith']" :len="state.length"></VehicleState>
+            <VehicleState
+                :class="{ vehicle_state_last: item['vehicle_id'] == 4, vehicle_state: item['vehicle_id'] != 4 }"
+                :vehicle_id="item['vehicle_id']"
+                :ith="item['ith']"
+                :len="state.length"
+            ></VehicleState>
         </div>
     </div>
 </template>
 
-<style scoped>
+<style>
 .map_container {
     width: 100%;
-    height: 95%;
-    display: inline;
-    float: left;
-    position: relative;
+    height: 100%;
 }
 #map {
     width: 100%;
-    height: 78%;
-    margin-top: 1%;
-    margin-bottom: 1%;
+    height: 95%;
+    margin-bottom: 10px;
+}
+.vehicle_state {
+    margin-right: 1%;
+    line-height: 1.5em;
+    font-size: 1.5em;
+    height: 4%;
+    color: black;
+    background-color: aliceblue;
+    display: inline;
+    float: left;
+}
+.vehicle_state_last {
+    margin-right: 0;
+    line-height: 1.5em;
+    font-size: 1.5em;
+    height: 4%;
+    color: black;
+    background-color: aliceblue;
+    display: inline;
+    /* float: left; */
 }
 </style>
