@@ -32,7 +32,7 @@ const newInstanceState = (vehicle_id, latLngList) => {
         ith: 1,
         instance: L.moveMarker(
             [latLngList[0], latLngList[1]],
-            { duration: 1000, rotateMarker: true, color: generateColor() },
+            { duration: 1000, rotateMarker: false, color: "#ff0000" },
             { duration: 1000, removeFirstLines: true, icon: myIcon },
             {}
         ),
