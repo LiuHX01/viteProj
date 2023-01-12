@@ -47,11 +47,14 @@ onMounted(() => {
         renderer: L.canvas(),
     }).setView([39.92123, 116.51172], 12);
 
-    L.tileLayer("https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}", {
+    L.tileLayer("http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}", {
         zoom: 12,
     }).addTo(map);
-    /*
+    /**
      * 谷歌源 https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}
+     * 高德路网 https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=8<ype=11
+     * 高德矢量 http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}
+     * https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}
      */
 
     // add more lines to the trajectory instance
@@ -124,6 +127,6 @@ onMounted(() => {
     color: black;
     background-color: aliceblue;
     display: inline;
-    /* float: left; */
+    float: left;
 }
 </style>

@@ -17,8 +17,8 @@ export function csvToArray(str, delimiter = ",") {
 
 // This function is used to generate a random color
 export function generateColor() {
-    // return "#" + Math.floor(Math.random() * 0x999999).toString(16);
-    return chooseFromColors();
+    return "#" + Math.floor(Math.random() * 0x333).toString(16);
+    // return chooseFromColors();
 }
 
 function chooseFromColors() {
