@@ -6,6 +6,8 @@ import { dataAdaptor } from "./Adaptor.js";
 import "l.movemarker";
 import { generateColor } from "./Tools";
 import VehicleState from "./VehicleState.vue";
+import "leaflet.chinatmsproviders";
+import "tilelayer-canvas";
 
 // array of objects to store the state of each trajectory instance
 const state = reactive([]);
@@ -47,13 +49,22 @@ onMounted(() => {
         renderer: L.canvas(),
     }).setView([39.92123, 116.51172], 12);
 
-    L.tileLayer("http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}", {
-        zoom: 12,
-    }).addTo(map);
+    // 方案一：使用leaflet.chinatmsproviders插件
+    // L.tileLayer.chinaProvider("Tencent.Normal.Map", { zoom: 12, maxZoom: 18, minZoom: 5 }).addTo(map);
+
+    // 方案二：使用tilelayer-canvas插件
+    L.tileLayer
+        .canvas("http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0", {
+            zoom: 12,
+        })
+        .addTo(map);
+
     /**
      * 谷歌源 https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}
      * 高德路网 https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=8<ype=11
      * 高德矢量 http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}
+     * 百度 http://online{s}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=pl&scaler=1&p=1
+     * 腾讯 http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={y}&type=vector&style=0
      * https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}
      */
 
