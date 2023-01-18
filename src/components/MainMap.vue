@@ -2,7 +2,7 @@
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { nextTick, onMounted, reactive } from "vue";
-import { dataAdaptor } from "./Adaptor.js";
+import { GPSAdaptor } from "./Adaptor.js";
 import "l.movemarker";
 import { generateColor } from "./Tools";
 import VehicleState from "./VehicleState.vue";
@@ -86,7 +86,7 @@ onMounted(() => {
     };
 
     // listen to the data from the adaptor
-    dataAdaptor.DataListener((data) => {
+    GPSAdaptor.DataListener((data) => {
         newInstanceState(data[1], getLatLngList(data[0]));
         nextTick(() => {
             state[data[1]].instance.addTo(map);
@@ -100,12 +100,7 @@ onMounted(() => {
     <div class="map_container">
         <div id="map"></div>
         <div v-for="item of state">
-            <VehicleState
-                :class="{ vehicle_state_last: item['vehicle_id'] == 4, vehicle_state: item['vehicle_id'] != 4 }"
-                :vehicle_id="item['vehicle_id']"
-                :ith="item['ith']"
-                :len="state.length"
-            ></VehicleState>
+            <VehicleState :vehicle_id="item['vehicle_id']" :ith="item['ith']" :len="state.length"></VehicleState>
         </div>
     </div>
 </template>
@@ -116,28 +111,9 @@ onMounted(() => {
     height: 100%;
 }
 #map {
-    width: 100%;
+    width: 99%;
     height: 95%;
     margin-bottom: 10px;
-}
-.vehicle_state {
-    margin-right: 1%;
-    line-height: 1.5em;
-    font-size: 1.5em;
-    height: 4%;
-    color: black;
-    background-color: aliceblue;
-    display: inline;
-    float: left;
-}
-.vehicle_state_last {
-    margin-right: 0;
-    line-height: 1.5em;
-    font-size: 1.5em;
-    height: 4%;
-    color: black;
-    background-color: aliceblue;
-    display: inline;
-    float: left;
+    margin-left: 0.5%;
 }
 </style>

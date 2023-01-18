@@ -45,3 +45,51 @@ const colors = [
     "#1e9d95",
     "#7289AB",
 ];
+
+export const csvToJSON = (csv) => {
+    const lines = csv.split("\n");
+    const result = [];
+    const headers = lines[0].split(",");
+    for (let i = 1; i < lines.length; i++) {
+        const obj = {};
+        const currentline = lines[i].split(",");
+        for (let j = 0; j < headers.length; j++) {
+            obj[headers[j]] = currentline[j];
+        }
+        result.push(obj);
+    }
+    return result;
+};
+export const dataProcess = (data) => {
+    const result = new Array(numberOfUniqueKeys(data, "frame"));
+    for (let i = 0; i < result.length; i++) {
+        result[i] = [];
+    }
+
+    data.sort((a, b) => {
+        return a.id - b.id;
+    });
+
+    data.forEach((item) => {
+        result[item.frame].push({
+            x: item.x,
+            y: item.y,
+            value: {
+                acceleration: item.acceleration,
+                distance_centroid: item.distance_centroid,
+                heading_change: item.heading_change,
+                speed: item.speed,
+            },
+        });
+    });
+
+    return result;
+};
+
+const numberOfUniqueKeys = (data, key) => {
+    const keys = new Set();
+    data.forEach((item) => {
+        keys.add(item[key]);
+    });
+    return keys.size;
+};

@@ -1,4 +1,4 @@
-import mitt from 'mitt'
+import mitt from "mitt";
 
 const emitter = mitt();
 
@@ -16,4 +16,5 @@ class DataAdaptor {
     }
 }
 
-export const dataAdaptor = new DataAdaptor('trajectoryData');
+export const GPSAdaptor = new DataAdaptor("GPSData");
+export const MotionAdaptor = new DataAdaptor("MotionData");
