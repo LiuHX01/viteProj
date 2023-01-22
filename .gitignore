@@ -25,4 +25,4 @@ dist-ssr
 *.sln
 *.sw?
 
-public/*
+public/vdata/*
