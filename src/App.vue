@@ -15,7 +15,7 @@ const fetchData = async () => {
     //     GPSAdaptor.DataEmitter([csvToArray(rawData.data), i]);
     // }
 
-    const motionData = await Axios.get("/newFishs/fish_1.csv", {
+    const motionData = await Axios.get("/newFishs/fishdatashort.csv", {
         responseType: "text",
     });
     MotionAdaptor.DataEmitter(csvToJSON(motionData.data));
