@@ -5,6 +5,9 @@ import { DataSet } from "./M-DataSet.js";
 import { Draw } from "./M-Draw.js";
 
 const rugs = reactive({});
+const load = reactive({
+    loading: true,
+});
 
 onMounted(() => {
     MotionAdaptor.DataListener((data) => {
@@ -35,6 +38,8 @@ onMounted(() => {
             }
         }
         // console.log("after draw");
+        load.loading = false;
+        console.log(`after loading ${load.loading}`);
     });
 
     const canvas = document.getElementById("canvas");
@@ -44,7 +49,7 @@ onMounted(() => {
 
 <template>
     <div>
-        <el-scrollbar>
+        <el-scrollbar v-loading="load.loading" element-loading-background="rgba(36,36,36,1)">
             <canvas id="canvas"></canvas>
         </el-scrollbar>
     </div>
