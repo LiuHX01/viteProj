@@ -41,7 +41,9 @@ onMounted(() => {
 
 <template>
     <div>
-        <canvas id="canvas"></canvas>
+        <el-scrollbar>
+            <canvas id="canvas"></canvas>
+        </el-scrollbar>
     </div>
 </template>
 

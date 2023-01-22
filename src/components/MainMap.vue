@@ -108,12 +108,11 @@ onMounted(() => {
 <style>
 .map_container {
     width: 100%;
-    height: 100%;
+    height: 75%;
 }
 #map {
-    width: 99%;
-    height: 95%;
+    width: 100%;
+    height: 85%;
     margin-bottom: 10px;
-    margin-left: 0.5%;
 }
 </style>
