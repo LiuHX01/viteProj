@@ -15,13 +15,19 @@ const fetchData = async () => {
         GPSAdaptor.DataEmitter([csvToArray(rawData.data), i]);
     }
 
-    const motionData = await Axios.get("/newFishs/fishdatashort.csv", {
-        responseType: "text",
-    });
-    MotionAdaptor.DataEmitter(csvToJSON(motionData.data));
+    // const motionData = await Axios.get("/newFishs/fishdatashort.csv", {
+    //     responseType: "text",
+    // });
+    // MotionAdaptor.DataEmitter(csvToJSON(motionData.data));
 };
 
+const worker = new Worker("/Worker.js");
+
 onMounted(() => {
+    worker.postMessage("load");
+    worker.onmessage = (e) => {
+        MotionAdaptor.DataEmitter(csvToJSON(e.data));
+    };
     fetchData();
 });
 </script>

@@ -13,7 +13,7 @@ onMounted(() => {
         rugs["curDataSet"] = new DataSet(data);
 
         let ordered = rugs["curDataSet"].getOrderedData("Hilbert");
-        // console.log(ordered);
+
         rugs["draw"] = new Draw(
             ordered,
             rugs["curDataSet"].getFeatureMins(currFeature),
@@ -25,13 +25,16 @@ onMounted(() => {
         canvas.width = ordered.length;
         canvas.height = ordered[0].length;
 
-        // console.log(ordered[0][0]);
+        // const myImageData = ctx.createImageData(canvas.width, canvas.height);
+        console.log("before draw");
         for (let i = 0; i < ordered.length; i++) {
             for (let j = 0; j < ordered[i].length; j++) {
                 ctx.fillStyle = rugs["draw"].getColor(ordered[i][j]["value"][currFeature]);
                 ctx.fillRect(i, j, 1, 1);
+                //         ctx.pushImageData(rugs["draw"].getColor(ordered[i][j]["value"][currFeature]), i, j);
             }
         }
+        // console.log("after draw");
     });
 
     const canvas = document.getElementById("canvas");
