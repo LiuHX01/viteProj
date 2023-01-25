@@ -1,4 +1,5 @@
 import { HilbertCurveStrategy } from "./M-Strategy.js";
+import percentile from "percentile";
 
 export class DataSet {
     constructor(data) {
@@ -16,21 +17,27 @@ export class DataSet {
         this.baseData = this.#getBaseData(this.data);
         this.features.forEach((feature) => {
             if (
-                feature === "acceleration" ||
-                feature === "distance_centroid" ||
-                feature === "heading_change" ||
+                // feature === "acceleration" ||
+                // feature === "distance_centroid" ||
+                // feature === "heading_change" ||
                 feature === "speed"
             ) {
+                console.time("sort");
                 // 计算每个feature的最大值和最小值
                 const sortedFeatureValue = this.data.sort((a, b) => a[feature] - b[feature]);
                 this.featureMins[feature] = sortedFeatureValue[0][feature];
                 this.featureMaxs[feature] = sortedFeatureValue[sortedFeatureValue.length - 1][feature];
 
+                // console.log(this.data);
+
                 // 计算每个feature的百分位数
                 for (let i = 1; i < 10; i++) {
                     if (!this.deciles[feature]) this.deciles[feature] = [];
                     this.deciles[feature].push(this.#getPercentile(feature, sortedFeatureValue, i * 10));
+                    // const temp = percentile(i * 10, this.data, (item) => item[feature]);
+                    // this.deciles[feature].push(temp);
                 }
+                console.timeEnd("sort");
             }
         });
     }
