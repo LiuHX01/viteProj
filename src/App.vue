@@ -5,14 +5,21 @@ import Axios from "axios";
 import { onMounted } from "vue";
 import { csvToArray, csvToJSON } from "./components/Tools.js";
 import { GPSAdaptor, MotionAdaptor } from "./components/Adaptor.js";
+import csv from "csvtojson";
+import { myWorker } from "./components/MyWorker.js";
 
 // fetch data from the server
 const fetchData = async () => {
-    for (let i = 0; i < 5; i++) {
-        const rawData = await Axios.get(`/vehicledata/${i + 1}.csv`, {
+    for (let i = 1; i <= 30; i++) {
+        const rawData = await Axios.get(`/real/r${i}.csv`, {
             responseType: "text",
         });
-        GPSAdaptor.DataEmitter([csvToArray(rawData.data), i]);
+        csv()
+            .fromString(rawData.data)
+            .then((jsonObj) => {
+                // do something with jsonObj
+            });
+        // GPSAdaptor.DataEmitter([csvToArray(rawData.data), i]);
     }
 
     // const motionData = await Axios.get("/newFishs/fishdatashort.csv", {
@@ -24,10 +31,10 @@ const fetchData = async () => {
 const worker = new Worker("/Worker.js");
 
 onMounted(() => {
-    worker.postMessage("load");
-    worker.onmessage = (e) => {
-        MotionAdaptor.DataEmitter(csvToJSON(e.data));
-    };
+    // worker.postMessage("load");
+    // worker.onmessage = (e) => {
+    //     MotionAdaptor.DataEmitter(csvToJSON(e.data));
+    // };
     fetchData();
 });
 </script>
