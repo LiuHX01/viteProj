@@ -4,7 +4,7 @@ onmessage = (msg) => {
         const cnt = msgData.info;
         console.time(`load ${cnt} files`);
         for (let i = 1; i <= cnt; i++) {
-            fetch(`/spd/spd${i}.csv`)
+            fetch(`https://raw.githubusercontent.com/LiuHX01/DataSets/main/spd${i}.csv`)
                 .then((response) => {
                     return response.text();
                 })
