@@ -43,7 +43,7 @@ export class DataSet {
                 // 计算每个feature的百分位数
                 for (let i = 1; i < 10; i++) {
                     if (!this.deciles[feature]) this.deciles[feature] = [];
-                    this.deciles[feature].push(this.#getPercentile(feature, sortedFeatureValue, i * 10));
+                    this.deciles[feature].push(parseFloat(this.#getPercentile(feature, sortedFeatureValue, i * 10)));
                     // const temp = percentile(i * 10, this.data, (item) => item[feature]);
                     // this.deciles[feature].push(temp);
                 }
@@ -84,7 +84,7 @@ export class DataSet {
         const index = (sorted.length * percentile) / 100;
         if (Math.round(index) === index) {
             if (index === 0) return sorted[0];
-            return sorted[index - 1][feature];
+            return sorted[index][feature];
         }
         return sorted[Math.round(index)][feature];
     }
