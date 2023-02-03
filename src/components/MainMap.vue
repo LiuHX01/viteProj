@@ -113,20 +113,22 @@ onMounted(() => {
 <template>
     <div class="map_container">
         <div id="map"></div>
-        <div v-for="item of state">
-            <!-- <VehicleState :vehicle_id="item['vehicle_id']" :ith="item['ith']" :len="state.length"></VehicleState> -->
-        </div>
+        <!-- <el-scrollbar>
+            <div v-for="item of state">
+                <VehicleState :vehicle_id="item['id']" :ith="item['ith']" :len="state.length"></VehicleState>
+            </div>
+        </el-scrollbar> -->
     </div>
 </template>
 
 <style>
 .map_container {
     width: 100%;
-    height: 75%;
+    height: 85%;
 }
 #map {
     width: 100%;
-    height: 85%;
+    height: 95%;
     margin-bottom: 10px;
 }
 </style>
