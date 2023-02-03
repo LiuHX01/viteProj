@@ -21,6 +21,7 @@ export class Draw {
     }
 
     getColor(value) {
+        // console.log(value);
         return this.bqcm.getColorByValue(value);
     }
 }
@@ -34,7 +35,6 @@ class BinnedPercentileColorMapper {
     }
 
     getColorByValue(value) {
-        // console.log(this.searchBin(value));
         return this.colors[this.searchBin(value)];
     }
 

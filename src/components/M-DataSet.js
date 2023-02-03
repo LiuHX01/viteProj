@@ -4,7 +4,7 @@ import percentile from "percentile";
 export class DataSet {
     constructor(data) {
         this.data = data;
-        this.features = Object.keys(data[0]);
+        this.features = Object.keys(data[0][0]);
         this.baseData = null;
         this.deciles = {};
         this.orderedDataSet = null;
@@ -15,6 +15,8 @@ export class DataSet {
 
     #init() {
         this.baseData = this.#getBaseData(this.data);
+        // console.log(this.baseData);
+        // console.log(this.features);
         this.features.forEach((feature) => {
             if (
                 // feature === "acceleration" ||
@@ -24,11 +26,19 @@ export class DataSet {
             ) {
                 console.time("sort");
                 // 计算每个feature的最大值和最小值
-                const sortedFeatureValue = this.data.sort((a, b) => a[feature] - b[feature]);
+                // const sortedFeatureValue = this.data.sort((a, b) => a[feature] - b[feature]);
+                // this.featureMins[feature] = sortedFeatureValue[0][feature];
+                // this.featureMaxs[feature] = sortedFeatureValue[sortedFeatureValue.length - 1][feature];
+
+                const sortedFeatureValue = this.data
+                    .reduce((a, b) => {
+                        return a.concat(b);
+                    })
+                    .sort((a, b) => a[feature] - b[feature]);
                 this.featureMins[feature] = sortedFeatureValue[0][feature];
                 this.featureMaxs[feature] = sortedFeatureValue[sortedFeatureValue.length - 1][feature];
 
-                // console.log(this.data);
+                // console.log(sortedFeatureValue);
 
                 // 计算每个feature的百分位数
                 for (let i = 1; i < 10; i++) {
@@ -37,30 +47,32 @@ export class DataSet {
                     // const temp = percentile(i * 10, this.data, (item) => item[feature]);
                     // this.deciles[feature].push(temp);
                 }
+                console.log(this.deciles);
                 console.timeEnd("sort");
             }
         });
     }
     // 返回2D array，每个array是一个frame的数据
     #getBaseData(data) {
-        const result = new Array(this.#numberOfUniqueKeys(data, "frame"));
-        for (let i = 0; i < result.length; i++) {
-            result[i] = [];
-        }
+        let result = [];
+
         data.sort((a, b) => {
             return a.id - b.id;
         });
         data.forEach((item) => {
-            result[item.frame].push({
-                x: item.x,
-                y: item.y,
-                value: {
-                    acceleration: item.acceleration,
-                    distance_centroid: item.distance_centroid,
-                    heading_change: item.heading_change,
-                    speed: item.speed,
-                },
-                id: item.id,
+            item.forEach((sitem) => {
+                if (!result[sitem.time]) result[sitem.time] = [];
+                result[sitem.time].push({
+                    latitude: sitem.latitude,
+                    longitude: sitem.longitude,
+                    value: {
+                        // acceleration: item.acceleration,
+                        // distance_centroid: item.distance_centroid,
+                        // heading_change: item.heading_change,
+                        speed: sitem.speed,
+                    },
+                    id: sitem.id,
+                });
             });
         });
         return result;

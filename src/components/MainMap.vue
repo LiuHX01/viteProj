@@ -14,7 +14,7 @@ const state = reactive([]);
 
 // icon for the moving marker
 const myIcon = L.icon({
-    iconSize: [24, 24],
+    iconSize: [16, 16],
     iconUrl: "/vehicle.svg",
 });
 
@@ -28,14 +28,15 @@ const getLatLngList = (data) => {
 };
 
 // create a new instance of trajectory
-const newInstanceState = (vehicle_id, latLngList) => {
+const newInstanceState = (id, latLngList) => {
     state.push({
-        vehicle_id: vehicle_id,
+        id: id,
+        prev_i: 0,
         ith: 1,
         instance: L.moveMarker(
-            [latLngList[0], latLngList[1]],
-            { duration: 1000, color: generateColor() },
-            { duration: 1000, removeFirstLines: true, maxLengthLines: 5, icon: myIcon },
+            [latLngList[0]],
+            { duration: 500, color: generateColor() },
+            { duration: 500, removeFirstLines: true, maxLengthLines: 1, icon: myIcon },
             {}
         ),
         timer: null,
@@ -44,7 +45,6 @@ const newInstanceState = (vehicle_id, latLngList) => {
 };
 
 onMounted(() => {
-    // initialize the map
     const map = L.map("map", {
         renderer: L.canvas(),
     }).setView([39.92123, 116.51172], 12);
@@ -59,39 +59,53 @@ onMounted(() => {
         })
         .addTo(map);
 
-    /**
-     * 谷歌源 https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}
-     * 高德路网 https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=8<ype=11
-     * 高德矢量 http://wprd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}
-     * 百度 http://online{s}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles=pl&scaler=1&p=1
-     * 腾讯 http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={y}&type=vector&style=0
-     * https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}
-     */
-
     // add more lines to the trajectory instance
     const moreLines = (idx) => {
-        if (state[idx].ith == 1) {
+        if (state[idx].ith == 0) {
             console.log(`trajectory ${idx}, length is ${state[idx].latLngList.length}`);
+            state[idx].ith++;
         } else if (state[idx].ith == state[idx].latLngList.length - 1) {
-            clearInterval(state[idx].timer);
+            // clearInterval(state[idx].timer);
+            console.log(`trajectory ${idx} finished`);
         } else {
-            state[idx].instance.addMoreLine(state[idx].latLngList[state[idx].ith], {
-                animatePolyline: true,
-            });
+            if (state[idx].prev_i != state[idx].ith) {
+                state[idx].instance.addMoreLine(state[idx].latLngList[state[idx].ith], {
+                    animatePolyline: true,
+                });
+                state[idx].prev_i = state[idx].ith;
+            }
+            state[idx].ith++;
         }
-        state[idx].ith++;
+
         state[idx].timer = setTimeout(() => {
             moreLines(idx);
-        }, 1100);
+        }, 1000);
     };
 
     // listen to the data from the adaptor
-    GPSAdaptor.DataListener((data) => {
-        newInstanceState(data[1], getLatLngList(data[0]));
-        nextTick(() => {
-            state[data[1]].instance.addTo(map);
-            moreLines(data[1]);
-        });
+    GPSAdaptor.DataListener((dataGroupByTime) => {
+        for (let i in dataGroupByTime) {
+            for (let j in dataGroupByTime[i]) {
+                const lat = parseFloat(dataGroupByTime[i][j]["latitude"]);
+                const lng = parseFloat(dataGroupByTime[i][j]["longitude"]);
+                const id = dataGroupByTime[i][j]["id"];
+                if (!state[id]) {
+                    newInstanceState(id, [[lat, lng]]);
+                    nextTick(() => {
+                        state[id].instance.addTo(map);
+                        moreLines(id);
+                    });
+                } else {
+                    // console.log(`trajectory ${id} is already in the map`);
+                    state[id].latLngList.push([lat, lng]);
+                }
+            }
+        }
+
+        // nextTick(() => {
+        // state[data[1]].instance.addTo(map);
+        // moreLines(data[1]);
+        // });
     });
 });
 </script>
@@ -100,7 +114,7 @@ onMounted(() => {
     <div class="map_container">
         <div id="map"></div>
         <div v-for="item of state">
-            <VehicleState :vehicle_id="item['vehicle_id']" :ith="item['ith']" :len="state.length"></VehicleState>
+            <!-- <VehicleState :vehicle_id="item['vehicle_id']" :ith="item['ith']" :len="state.length"></VehicleState> -->
         </div>
     </div>
 </template>

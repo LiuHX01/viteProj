@@ -27,7 +27,7 @@ const hexColorToRGB = (hex) => {
 onMounted(() => {
     MotionAdaptor.DataListener((data) => {
         const currFeature = "speed";
-
+        // console.log(data);
         rugs["curDataSet"] = new DataSet(data);
 
         let ordered = rugs["curDataSet"].getOrderedData("Hilbert");

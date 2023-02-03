@@ -1,10 +1,22 @@
-onmessage = async (msg) => {
-    if (msg.data == "load") {
-        fetch("/newFishs/fishdatashort.csv")
-            .then((response) => response.text())
-            .then((data) => {
-                postMessage(data);
-                console.log("Worker: Message posted to main script");
-            });
+onmessage = (msg) => {
+    const msgData = msg.data;
+    if (msgData.type == "load") {
+        const cnt = msgData.info;
+        console.time(`load ${cnt} files`);
+        for (let i = 1; i <= cnt; i++) {
+            fetch(`/spd/spd${i}.csv`)
+                .then((response) => {
+                    return response.text();
+                })
+                .then((data) => {
+                    postMessage({
+                        data: data,
+                        type: "load",
+                        info: i,
+                    });
+                    // console.log(`Loaded ${i}`);
+                });
+        }
+        console.timeEnd(`load ${cnt} files`);
     }
 };

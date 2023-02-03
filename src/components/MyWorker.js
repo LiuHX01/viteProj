@@ -3,10 +3,11 @@ class MyWorker {
         this.worker = new Worker("/Worker.js");
     }
 
-    sendMsg(data, type) {
+    sendMsg(data, type, info = null) {
         this.worker.postMessage({
             data: data,
             type: type,
+            info: info,
         });
     }
 
