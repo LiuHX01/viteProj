@@ -1,6 +1,7 @@
 <script setup>
 import MainMap from "./components/MainMap.vue";
 import MotionRugs from "./components/MotionRugs.vue";
+import SideBar from "./components/SideBar.vue";
 import { onMounted, watch, ref } from "vue";
 import { GPSAdaptor, MotionAdaptor } from "./components/Adaptor.js";
 import csv from "csvtojson";
@@ -46,12 +47,14 @@ onMounted(() => {
 <template>
     <div class="container">
         <el-container class="main-container">
-            <el-header></el-header>
+            <!-- <el-header></el-header> -->
             <el-container>
                 <el-main>
                     <MainMap></MainMap>
                 </el-main>
-                <el-aside width="200px"></el-aside>
+                <el-aside width="300px">
+                    <SideBar></SideBar>
+                </el-aside>
             </el-container>
             <el-footer>
                 <MotionRugs></MotionRugs>
@@ -70,7 +73,13 @@ onMounted(() => {
     height: 100%;
     flex-shrink: 0;
 }
-/* .el-main { */
-/* padding: 0 0; */
-/* } */
+.el-container {
+    height: 95%;
+}
+.el-main {
+    padding: 0 0;
+}
+.el-footer {
+    padding: 0 0;
+}
 </style>
