@@ -47,17 +47,17 @@ const newInstanceState = (id, latLngList) => {
 onMounted(() => {
     const map = L.map("map", {
         renderer: L.canvas(),
-    }).setView([39.92123, 116.51172], 12);
+    }).setView([39.92641, 116.38876], 12);
 
     // 方案一：使用leaflet.chinatmsproviders插件
-    // L.tileLayer.chinaProvider("Tencent.Normal.Map", { zoom: 12, maxZoom: 18, minZoom: 5 }).addTo(map);
+    L.tileLayer.chinaProvider("Tencent.Normal.Map", { zoom: 12, maxZoom: 18, minZoom: 5 }).addTo(map);
 
     // 方案二：使用tilelayer-canvas插件
-    L.tileLayer
-        .canvas("http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0", {
-            zoom: 12,
-        })
-        .addTo(map);
+    // L.tileLayer
+    //     .canvas("http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0", {
+    //         zoom: 12,
+    //     })
+    //     .addTo(map);
 
     // add more lines to the trajectory instance
     const moreLines = (idx) => {
@@ -124,11 +124,11 @@ onMounted(() => {
 <style>
 .map_container {
     width: 100%;
-    height: 85%;
+    height: 100%;
 }
 #map {
     width: 100%;
-    height: 95%;
-    margin-bottom: 10px;
+    height: 100%;
+    /* margin-bottom: 10px; */
 }
 </style>

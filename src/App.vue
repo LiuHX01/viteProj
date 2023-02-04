@@ -46,13 +46,16 @@ onMounted(() => {
 <template>
     <div class="container">
         <el-container class="main-container">
-            <el-header height="5%"></el-header>
+            <el-header></el-header>
             <el-container>
                 <el-main>
                     <MainMap></MainMap>
-                    <MotionRugs></MotionRugs>
                 </el-main>
+                <el-aside width="200px"></el-aside>
             </el-container>
+            <el-footer>
+                <MotionRugs></MotionRugs>
+            </el-footer>
         </el-container>
     </div>
 </template>
@@ -67,4 +70,7 @@ onMounted(() => {
     height: 100%;
     flex-shrink: 0;
 }
+/* .el-main { */
+/* padding: 0 0; */
+/* } */
 </style>
