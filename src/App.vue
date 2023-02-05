@@ -1,7 +1,5 @@
 <script setup>
 import MainMap from "./components/MainMap.vue";
-import MotionRugs from "./components/MotionRugs.vue";
-import SideBar from "./components/SideBar.vue";
 import { onMounted, watch, ref } from "vue";
 import { GPSAdaptor, MotionAdaptor } from "./components/Adaptor.js";
 import csv from "csvtojson";
@@ -37,7 +35,6 @@ onMounted(() => {
                         dataGroupByTime[i].push(jsonObj[i]);
                     }
                     finished.value++;
-                    // console.log(`load ${info} done, finish ${finished.value} of 90`);
                 });
         }
     });

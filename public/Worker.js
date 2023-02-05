@@ -1,8 +1,8 @@
 onmessage = (msg) => {
     const msgData = msg.data;
     if (msgData.type == "load") {
+        let finished = 0;
         const cnt = msgData.info;
-        console.time(`load ${cnt} files`);
         for (let i = 1; i <= cnt; i++) {
             fetch(`https://raw.githubusercontent.com/LiuHX01/DataSets/main/spd${i}.csv`)
                 .then((response) => {
@@ -14,9 +14,9 @@ onmessage = (msg) => {
                         type: "load",
                         info: i,
                     });
-                    // console.log(`Loaded ${i}`);
+                    finished++;
+                    console.log(`fetch ${i}, ${finished} finished`);
                 });
         }
-        console.timeEnd(`load ${cnt} files`);
     }
 };

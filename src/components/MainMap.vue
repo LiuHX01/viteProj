@@ -7,7 +7,6 @@ import { nextTick, onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
 import "l.movemarker";
 import { generateColor } from "./Tools";
-import VehicleState from "./VehicleState.vue";
 import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 
@@ -20,15 +19,6 @@ const myIcon = L.icon({
     iconUrl: "/vehicle.svg",
 });
 
-// convert the data to a list of latlng
-const getLatLngList = (data) => {
-    const latLngList = [];
-    data.forEach((element) => {
-        latLngList.push([Number(element["latitude"]), Number(element["longitude"])]);
-    });
-    return latLngList;
-};
-
 // create a new instance of trajectory
 const newInstanceState = (id, latLngList) => {
     state.push({
@@ -37,8 +27,8 @@ const newInstanceState = (id, latLngList) => {
         ith: 1,
         instance: L.moveMarker(
             [latLngList[0]],
-            { duration: 500, color: generateColor() },
-            { duration: 500, removeFirstLines: true, maxLengthLines: 1, icon: myIcon },
+            { duration: 900, color: generateColor() },
+            { duration: 900, removeFirstLines: true, maxLengthLines: 1, icon: myIcon },
             {}
         ),
         timer: null,
@@ -51,24 +41,13 @@ onMounted(() => {
         renderer: L.canvas(),
     }).setView([39.92641, 116.38876], 12);
 
-    // 方案一：使用leaflet.chinatmsproviders插件
     L.tileLayer.chinaProvider("Tencent.Normal.Map", { zoom: 12, maxZoom: 18, minZoom: 5 }).addTo(map);
-
-    // 方案二：使用tilelayer-canvas插件
-    // L.tileLayer
-    //     .canvas("http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0", {
-    //         zoom: 12,
-    //     })
-    //     .addTo(map);
 
     // add more lines to the trajectory instance
     const moreLines = (idx) => {
         if (state[idx].ith == 0) {
-            console.log(`trajectory ${idx}, length is ${state[idx].latLngList.length}`);
             state[idx].ith++;
         } else if (state[idx].ith == state[idx].latLngList.length - 1) {
-            // clearInterval(state[idx].timer);
-            console.log(`trajectory ${idx} finished`);
         } else {
             if (state[idx].prev_i != state[idx].ith) {
                 state[idx].instance.addMoreLine(state[idx].latLngList[state[idx].ith], {
@@ -98,35 +77,24 @@ onMounted(() => {
                         moreLines(id);
                     });
                 } else {
-                    // console.log(`trajectory ${id} is already in the map`);
                     state[id].latLngList.push([lat, lng]);
                 }
             }
         }
-
-        // nextTick(() => {
-        // state[data[1]].instance.addTo(map);
-        // moreLines(data[1]);
-        // });
     });
 });
 </script>
 
 <template>
     <el-container class="main-container">
-        <!-- <el-header></el-header> -->
         <el-container>
             <el-main>
                 <div class="map_container">
                     <div id="map"></div>
-                    <!-- <el-scrollbar>
-            <div v-for="item of state">
-                <VehicleState :vehicle_id="item['id']" :ith="item['ith']" :len="state.length"></VehicleState>
-            </div>
-        </el-scrollbar> -->
                 </div>
             </el-main>
             <el-aside width="300px">
+                <!-- <SideBar :vehicles="state"></SideBar> -->
                 <SideBar></SideBar>
             </el-aside>
         </el-container>
