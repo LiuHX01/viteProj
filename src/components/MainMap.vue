@@ -3,7 +3,7 @@ import MotionRugs from "./MotionRugs.vue";
 import SideBar from "./SideBar.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import { nextTick, onMounted, reactive } from "vue";
+import { nextTick, onMounted, reactive, computed } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
 import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
@@ -24,6 +24,16 @@ const config = reactive({
 });
 
 const vehicles = reactive({});
+let vehicleStates = computed(() => {
+    let result = [];
+    for (let i in vehicles) {
+        result.push({
+            id: vehicles[i].id,
+            frame: vehicles[i].frame,
+        });
+    }
+    return result;
+});
 
 // 初始化地图
 const initMap = () => {
@@ -120,7 +130,7 @@ onMounted(() => {
                 </div>
             </el-main>
             <el-aside width="300px">
-                <SideBar></SideBar>
+                <SideBar :vstates="vehicles"></SideBar>
             </el-aside>
         </el-container>
         <el-footer>
