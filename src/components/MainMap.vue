@@ -6,78 +6,105 @@ import * as L from "leaflet";
 import { nextTick, onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
 import "l.movemarker";
-import { generateColor } from "./Tools";
 import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
+import "leaflet.motion/dist/leaflet.motion.min.js";
+import { colors } from "./constant.js";
 
-// array of objects to store the state of each trajectory instance
-const state = reactive([]);
-
-// icon for the moving marker
-const myIcon = L.icon({
-    iconSize: [16, 16],
-    iconUrl: "/vehicle.svg",
+const config = reactive({
+    map: null,
+    latLng: [39.92641, 116.38876],
+    zoom: 12,
+    maxZoom: 18,
+    minZoom: 5,
+    duration: 1000,
+    icon: L.icon({
+        iconUrl: "/vehicle.svg",
+        iconSize: [16, 16],
+    }),
 });
 
-// create a new instance of trajectory
-const newInstanceState = (id, latLngList) => {
-    state.push({
+const vehicles = reactive({});
+
+// 初始化地图
+const initMap = () => {
+    const map = L.map("map", {
+        renderer: L.canvas(),
+    }).setView(config.latLng, config.zoom);
+
+    L.tileLayer
+        .chinaProvider("Tencent.Normal.Map", { zoom: config.zoom, maxZoom: config.maxZoom, minZoom: config.minZoom })
+        .addTo(map);
+
+    return map;
+};
+
+// 添加载具
+const addVehicle = (id, initLatLng) => {
+    vehicles[id] = {
         id: id,
-        prev_i: 0,
-        ith: 1,
-        instance: L.moveMarker(
-            [latLngList[0]],
-            { duration: 900, color: generateColor() },
-            { duration: 900, removeFirstLines: true, maxLengthLines: 1, icon: myIcon },
-            {}
-        ),
+        frame: 0,
+        latLngList: [initLatLng],
+        motion: null,
         timer: null,
-        latLngList: latLngList,
-    });
+    };
+};
+
+// 添加轨迹
+const addLine = (id) => {
+    const currLatLng = vehicles[id].latLngList[vehicles[id].frame];
+    const nextLatLng = vehicles[id].latLngList[vehicles[id].frame + 1];
+
+    if (vehicles[id].motion) {
+        vehicles[id].motion.remove();
+    }
+
+    if (vehicles[id].latLngList.length - 1 > vehicles[id].frame) {
+        vehicles[id].motion = L.motion
+            .polyline(
+                [currLatLng, nextLatLng],
+                {
+                    color: genColorById(id),
+                },
+                {
+                    auto: true,
+                    duration: config.duration,
+                    // easing: L.Motion.Ease.easeInOutQuart,
+                },
+                {
+                    removeOnEnd: false,
+                    showMarker: true,
+                    icon: config.icon,
+                }
+            )
+            .addTo(config.map);
+        vehicles[id].frame++;
+    }
+
+    vehicles[id].timer = setTimeout(() => {
+        addLine(id);
+    }, config.duration);
+};
+
+// 轨迹颜色
+const genColorById = (id) => {
+    return colors[id % colors.length];
 };
 
 onMounted(() => {
-    const map = L.map("map", {
-        renderer: L.canvas(),
-    }).setView([39.92641, 116.38876], 12);
+    config.map = initMap();
 
-    L.tileLayer.chinaProvider("Tencent.Normal.Map", { zoom: 12, maxZoom: 18, minZoom: 5 }).addTo(map);
-
-    // add more lines to the trajectory instance
-    const moreLines = (idx) => {
-        if (state[idx].ith == 0) {
-            state[idx].ith++;
-        } else if (state[idx].ith == state[idx].latLngList.length - 1) {
-        } else {
-            if (state[idx].prev_i != state[idx].ith) {
-                state[idx].instance.addMoreLine(state[idx].latLngList[state[idx].ith], {
-                    animatePolyline: true,
-                });
-                state[idx].prev_i = state[idx].ith;
-            }
-            state[idx].ith++;
-        }
-
-        state[idx].timer = setTimeout(() => {
-            moreLines(idx);
-        }, 1000);
-    };
-
-    // listen to the data from the adaptor
     GPSAdaptor.DataListener((dataGroupByTime) => {
         for (let i in dataGroupByTime) {
             for (let j in dataGroupByTime[i]) {
-                const lat = parseFloat(dataGroupByTime[i][j]["latitude"]);
-                const lng = parseFloat(dataGroupByTime[i][j]["longitude"]);
+                const lat = dataGroupByTime[i][j]["latitude"];
+                const lng = dataGroupByTime[i][j]["longitude"];
                 const id = dataGroupByTime[i][j]["id"];
-                if (!state[id]) {
-                    newInstanceState(id, [[lat, lng]]);
-                    nextTick(() => {
-                        state[id].instance.addTo(map);
-                        moreLines(id);
-                    });
+                if (!vehicles[id]) {
+                    addVehicle(id, [lat, lng]);
+                    addLine(id);
                 } else {
-                    state[id].latLngList.push([lat, lng]);
+                    vehicles[id].latLngList.push([lat, lng]);
                 }
             }
         }
@@ -94,7 +121,6 @@ onMounted(() => {
                 </div>
             </el-main>
             <el-aside width="300px">
-                <!-- <SideBar :vehicles="state"></SideBar> -->
                 <SideBar></SideBar>
             </el-aside>
         </el-container>

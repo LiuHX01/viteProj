@@ -28,7 +28,10 @@ onMounted(() => {
                 .then((jsonObj) => {
                     for (let i in jsonObj) {
                         jsonObj[i].id = info;
-                        jsonObj[i].time = i;
+                        jsonObj[i].time = parseInt(i);
+                        jsonObj[i].latitude = parseFloat(jsonObj[i].latitude);
+                        jsonObj[i].longitude = parseFloat(jsonObj[i].longitude);
+                        jsonObj[i].speed = parseFloat(jsonObj[i].speed);
                         if (!dataGroupByTime[i]) {
                             dataGroupByTime[i] = [];
                         }
