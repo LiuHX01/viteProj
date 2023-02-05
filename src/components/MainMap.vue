@@ -1,4 +1,6 @@
 <script setup>
+import MotionRugs from "./MotionRugs.vue";
+import SideBar from "./SideBar.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { nextTick, onMounted, reactive } from "vue";
@@ -111,17 +113,30 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="map_container">
-        <div id="map"></div>
-        <!-- <el-scrollbar>
+    <el-container class="main-container">
+        <!-- <el-header></el-header> -->
+        <el-container>
+            <el-main>
+                <div class="map_container">
+                    <div id="map"></div>
+                    <!-- <el-scrollbar>
             <div v-for="item of state">
                 <VehicleState :vehicle_id="item['id']" :ith="item['ith']" :len="state.length"></VehicleState>
             </div>
         </el-scrollbar> -->
-    </div>
+                </div>
+            </el-main>
+            <el-aside width="300px">
+                <SideBar></SideBar>
+            </el-aside>
+        </el-container>
+        <el-footer>
+            <MotionRugs></MotionRugs>
+        </el-footer>
+    </el-container>
 </template>
 
-<style>
+<style scoped>
 .map_container {
     width: 100%;
     height: 100%;
@@ -130,5 +145,19 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     /* margin-bottom: 10px; */
+}
+.main-container {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+}
+.el-container {
+    height: 95%;
+}
+.el-main {
+    padding: 0 0;
+}
+.el-footer {
+    padding: 0 0;
 }
 </style>

@@ -21,14 +21,14 @@ const handleClick = (tab, event) => {
     </el-tabs>
 </template>
 
-<style>
+<style scoped>
 /* .demo-tabs { */
 /* height: 100%; */
 /* } */
 .demo-tabs > .el-tabs__content {
-    padding: 32px;
+    padding: 16px;
     color: #6b778c;
-    font-size: 32px;
+    font-size: 16px;
     font-weight: 600;
 }
 </style>
