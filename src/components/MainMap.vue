@@ -5,7 +5,6 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { nextTick, onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
-import "l.movemarker";
 import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";

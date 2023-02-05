@@ -1,5 +1,4 @@
 import { HilbertCurveStrategy } from "./M-Strategy.js";
-import percentile from "percentile";
 
 export class DataSet {
     constructor(data) {
