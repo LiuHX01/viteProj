@@ -3,7 +3,7 @@ import MotionRugs from "./MotionRugs.vue";
 import SideBar from "./SideBar.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import { nextTick, onMounted, reactive, computed } from "vue";
+import { onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
 import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
@@ -23,17 +23,7 @@ const config = reactive({
     }),
 });
 
-const vehicles = reactive({});
-let vehicleStates = computed(() => {
-    let result = [];
-    for (let i in vehicles) {
-        result.push({
-            id: vehicles[i].id,
-            frame: vehicles[i].frame,
-        });
-    }
-    return result;
-});
+const vehicles = reactive({ state: {}, move: {} });
 
 // 初始化地图
 const initMap = () => {
@@ -50,9 +40,12 @@ const initMap = () => {
 
 // 添加载具
 const addVehicle = (id, initLatLng) => {
-    vehicles[id] = {
+    vehicles.state[id] = {
         id: id,
         frame: 0,
+        isRunning: true,
+    };
+    vehicles.move[id] = {
         latLngList: [initLatLng],
         motion: null,
         timer: null,
@@ -61,36 +54,38 @@ const addVehicle = (id, initLatLng) => {
 
 // 添加轨迹
 const addLine = (id) => {
-    const currLatLng = vehicles[id].latLngList[vehicles[id].frame];
-    const nextLatLng = vehicles[id].latLngList[vehicles[id].frame + 1];
+    if (vehicles.state[id].isRunning) {
+        if (vehicles.move[id].motion) {
+            vehicles.move[id].motion.remove();
+            vehicles.state[id].isRunning = false;
+        }
 
-    if (vehicles[id].motion) {
-        vehicles[id].motion.remove();
+        if (vehicles.move[id].latLngList.length - 1 > vehicles.state[id].frame) {
+            vehicles.state[id].isRunning = true;
+            const currLatLng = vehicles.move[id].latLngList[vehicles.state[id].frame];
+            const nextLatLng = vehicles.move[id].latLngList[vehicles.state[id].frame + 1];
+            vehicles.move[id].motion = L.motion
+                .polyline(
+                    [currLatLng, nextLatLng],
+                    {
+                        color: genColorById(id),
+                    },
+                    {
+                        auto: true,
+                        duration: config.duration,
+                        // easing: L.Motion.Ease.easeInOutQuart,
+                    },
+                    {
+                        removeOnEnd: false,
+                        showMarker: true,
+                        icon: config.icon,
+                    }
+                )
+                .addTo(config.map);
+            vehicles.state[id].frame++;
+        }
     }
-
-    if (vehicles[id].latLngList.length - 1 > vehicles[id].frame) {
-        vehicles[id].motion = L.motion
-            .polyline(
-                [currLatLng, nextLatLng],
-                {
-                    color: genColorById(id),
-                },
-                {
-                    auto: true,
-                    duration: config.duration,
-                    // easing: L.Motion.Ease.easeInOutQuart,
-                },
-                {
-                    removeOnEnd: false,
-                    showMarker: true,
-                    icon: config.icon,
-                }
-            )
-            .addTo(config.map);
-        vehicles[id].frame++;
-    }
-
-    vehicles[id].timer = setTimeout(() => {
+    vehicles.move[id].timer = setTimeout(() => {
         addLine(id);
     }, config.duration);
 };
@@ -98,6 +93,18 @@ const addLine = (id) => {
 // 轨迹颜色
 const genColorById = (id) => {
     return colors[id % colors.length];
+};
+
+const toggleHandler = (id) => {
+    if (id == "all") {
+        for (let i in vehicles.state) {
+            vehicles.state[i].isRunning = !vehicles.state[i].isRunning;
+            vehicles.move[i].motion.motionToggle();
+        }
+    } else {
+        vehicles.state[id].isRunning = !vehicles.state[id].isRunning;
+        vehicles.move[id].motion.motionToggle();
+    }
 };
 
 onMounted(() => {
@@ -109,11 +116,11 @@ onMounted(() => {
                 const lat = dataGroupByTime[i][j]["latitude"];
                 const lng = dataGroupByTime[i][j]["longitude"];
                 const id = dataGroupByTime[i][j]["id"];
-                if (!vehicles[id]) {
+                if (!vehicles.move[id] || !vehicles.state[id]) {
                     addVehicle(id, [lat, lng]);
                     addLine(id);
                 } else {
-                    vehicles[id].latLngList.push([lat, lng]);
+                    vehicles.move[id].latLngList.push([lat, lng]);
                 }
             }
         }
@@ -130,7 +137,7 @@ onMounted(() => {
                 </div>
             </el-main>
             <el-aside width="300px">
-                <SideBar :vstates="vehicles"></SideBar>
+                <SideBar :vstates="vehicles.state" @toggle="toggleHandler"></SideBar>
             </el-aside>
         </el-container>
         <el-footer>

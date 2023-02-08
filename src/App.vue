@@ -5,7 +5,7 @@ import { GPSAdaptor, MotionAdaptor } from "./components/Adaptor.js";
 import csv from "csvtojson";
 import { myWorker } from "./components/MyWorker.js";
 
-const FILE_COUNT = 90;
+const FILE_COUNT = 20;
 let dataGroupByTime = [];
 let finished = ref(0);
 
