@@ -277,9 +277,9 @@ onMounted(() => {
                 da[idx + 3] = 255;
             }
         }
+        console.timeEnd("draw");
         ctx.putImageData(img, 0, 0);
         load.loading = false;
-        console.timeEnd("draw");
     });
 });
 </script>
