@@ -52,13 +52,52 @@ const addVehicle = (id, initLatLng) => {
         motion: null,
         timer: null,
         trajetory: null,
+        lastOne: null,
+        lastTwo: null,
+        recentLine: 1,
     };
+};
+
+const handlelastLines = (id) => {
+    /**
+     * 线路1是最近的，本次运动之后线路1会变成次近，此时线路2是多余的
+     * 移除线路2，修改标识符
+     * 修改线路1透明度
+     * 设置线路2为新的最近
+     */
+    if (vehicles.move[id].recentLine === 1) {
+        if (vehicles.move[id].lastTwo) {
+            vehicles.move[id].lastTwo.remove();
+        }
+        vehicles.move[id].recentLine = 2;
+        if (vehicles.move[id].lastOne) {
+            vehicles.move[id].lastOne.setStyle({ opacity: 0.3 });
+        }
+        vehicles.move[id].lastTwo = L.polyline(
+            [vehicles.move[id].motion.getLatLngs()[0], vehicles.move[id].motion.getLatLngs()[1]],
+            { color: getColorById(id), opacity: 0.6 }
+        ).addTo(config.map);
+    } else {
+        if (vehicles.move[id].lastOne) {
+            vehicles.move[id].lastOne.remove();
+        }
+        vehicles.move[id].recentLine = 1;
+        if (vehicles.move[id].lastTwo) {
+            vehicles.move[id].lastTwo.setStyle({ opacity: 0.2 });
+        }
+        vehicles.move[id].lastOne = L.polyline(
+            [vehicles.move[id].motion.getLatLngs()[0], vehicles.move[id].motion.getLatLngs()[1]],
+            { color: getColorById(id), opacity: 0.5 }
+        ).addTo(config.map);
+    }
 };
 
 // 添加轨迹
 const addDynamicLine = (id) => {
     if (vehicles.state[id].isRunning) {
         if (vehicles.move[id].motion) {
+            handlelastLines(id);
+
             vehicles.move[id].motion.remove();
             vehicles.state[id].isRunning = false;
         }
@@ -76,7 +115,7 @@ const addDynamicLine = (id) => {
                     {
                         auto: true,
                         duration: config.duration,
-                        // easing: L.Motion.Ease.easeInOutQuart,
+                        easing: L.Motion.Ease.swing,
                     },
                     {
                         removeOnEnd: false,
