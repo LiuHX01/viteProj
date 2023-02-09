@@ -1,24 +1,20 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
+import { FILE_COUNT } from "./Constants.js";
 
 const props = defineProps(["vstates"]);
-const emit = defineEmits(["toggle"]);
+const emit = defineEmits(["toggle", "displayTrajectoryChange"]);
 
-const vehicleStates = computed(() => {
-    let result = [];
-    for (let i in props.vstates) {
-        result.push({
-            id: props.vstates[i].id,
-            frame: props.vstates[i].frame,
-        });
-    }
-    return result;
-});
 const activeName = ref("first");
-const collapseActiveName = ref("all");
+const collapseActiveName = ref(["all"]);
+const switchValue = ref(new Array(FILE_COUNT).fill(false));
 
 const toggle = (id) => {
     emit("toggle", id);
+};
+
+const displayTrajectoryChange = (id) => {
+    emit("displayTrajectoryChange", id);
 };
 </script>
 
@@ -26,7 +22,7 @@ const toggle = (id) => {
     <el-tabs type="border-card" v-model="activeName" class="demo-tabs">
         <el-tab-pane label="State" name="first">
             <el-scrollbar height="100%">
-                <el-collapse v-model="collapseActiveName" accordion>
+                <el-collapse v-model="collapseActiveName">
                     <el-collapse-item name="all">
                         <template #title>
                             <el-icon><Van /></el-icon>
@@ -51,6 +47,13 @@ const toggle = (id) => {
                             <el-button v-else type="primary" @click="toggle(item.id)">
                                 <el-icon><VideoPlay /></el-icon>
                             </el-button>
+                            <br />
+                            <el-switch
+                                v-model="switchValue[item.id]"
+                                active-text="Open"
+                                inactive-text="Close"
+                                @change="displayTrajectoryChange(item.id)"
+                            />
                         </el-collapse-item>
                     </div>
                 </el-collapse>

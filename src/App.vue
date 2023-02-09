@@ -4,8 +4,8 @@ import { onMounted, watch, ref } from "vue";
 import { GPSAdaptor, MotionAdaptor } from "./components/Adaptor.js";
 import csv from "csvtojson";
 import { myWorker } from "./components/MyWorker.js";
+import { FILE_COUNT } from "./components/Constants.js";
 
-const FILE_COUNT = 20;
 let dataGroupByTime = [];
 let finished = ref(0);
 

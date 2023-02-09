@@ -8,7 +8,7 @@ import { GPSAdaptor } from "./Adaptor.js";
 import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
-import { colors } from "./constant.js";
+import { colors } from "./Constants.js";
 
 const config = reactive({
     map: null,
@@ -44,11 +44,13 @@ const addVehicle = (id, initLatLng) => {
         id: id,
         frame: 0,
         isRunning: true,
+        displayTrajectory: false,
     };
     vehicles.move[id] = {
         latLngList: [initLatLng],
         motion: null,
         timer: null,
+        trajetory: null,
     };
 };
 
@@ -68,7 +70,7 @@ const addLine = (id) => {
                 .polyline(
                     [currLatLng, nextLatLng],
                     {
-                        color: genColorById(id),
+                        color: getColorById(id),
                     },
                     {
                         auto: true,
@@ -91,7 +93,7 @@ const addLine = (id) => {
 };
 
 // 轨迹颜色
-const genColorById = (id) => {
+const getColorById = (id) => {
     return colors[id % colors.length];
 };
 
@@ -104,6 +106,35 @@ const toggleHandler = (id) => {
     } else {
         vehicles.state[id].isRunning = !vehicles.state[id].isRunning;
         vehicles.move[id].motion.motionToggle();
+    }
+};
+
+const changeRangeHandler = (range) => {
+    const start = range[0];
+    const end = range[1];
+
+    // 对于每一个载具
+    for (let i in vehicles.state) {
+        // 清除该载具的轨迹
+        if (vehicles.move[i].trajetory) {
+            vehicles.move[i].trajetory.remove();
+        }
+        if (vehicles.state[i].displayTrajectory) {
+            // 对于该载具的range内每一条轨迹
+            const realEnd = Math.min(end, vehicles.move[i].latLngList.length - 1);
+            const realLatLngList = vehicles.move[i].latLngList.slice(start, realEnd);
+            console.log(`display trajectory of vehicle ${i} in range ${start} to ${realEnd}`);
+
+            vehicles.move[i].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[i].id) });
+            vehicles.move[i].trajetory.addTo(config.map);
+        }
+    }
+};
+
+const displayTrajectoryChangeHandler = (id) => {
+    vehicles.state[id].displayTrajectory = !vehicles.state[id].displayTrajectory;
+    if (!vehicles.state[id].displayTrajectory && vehicles.move[id].trajetory) {
+        vehicles.move[id].trajetory.remove();
     }
 };
 
@@ -137,11 +168,15 @@ onMounted(() => {
                 </div>
             </el-main>
             <el-aside width="300px">
-                <SideBar :vstates="vehicles.state" @toggle="toggleHandler"></SideBar>
+                <SideBar
+                    :vstates="vehicles.state"
+                    @toggle="toggleHandler"
+                    @displayTrajectoryChange="displayTrajectoryChangeHandler"
+                ></SideBar>
             </el-aside>
         </el-container>
         <el-footer>
-            <MotionRugs></MotionRugs>
+            <MotionRugs @changeRange="changeRangeHandler"></MotionRugs>
         </el-footer>
     </el-container>
 </template>

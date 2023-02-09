@@ -1,13 +1,16 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { MotionAdaptor } from "./Adaptor";
 import { DataSet } from "./M-DataSet.js";
 import { Draw } from "./M-Draw.js";
+
+const emit = defineEmits(["changeRange"]);
 
 const rugs = reactive({});
 const load = reactive({
     loading: true,
 });
+const value1 = ref([0, 50]);
 
 // input is a string of the form "#RRGGBB"
 const hexColorToRGB = (hex) => {
@@ -22,6 +25,10 @@ const hexColorToRGB = (hex) => {
         ret.b = parseInt(hex.substring(5, 7), 16);
     }
     return ret;
+};
+
+const changeRange = (range) => {
+    emit("changeRange", range);
 };
 
 onMounted(() => {
@@ -42,6 +49,7 @@ onMounted(() => {
 
         canvas.width = ordered.length;
         canvas.height = ordered[0].length;
+
         const img = ctx.createImageData(canvas.width, canvas.height);
         let da = img.data;
 
@@ -65,11 +73,6 @@ onMounted(() => {
 
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-
-    // ctx.imageSmoothingEnabled = true;
-    // ctx.mozImageSmoothingEnabled = true;
-    // ctx.webkitImageSmoothingEnabled = true;
-    // ctx.msImageSmoothingEnabled = true;
 });
 </script>
 
@@ -78,7 +81,20 @@ onMounted(() => {
         <el-scrollbar v-loading="load.loading" element-loading-background="rgba(36,36,36,1)">
             <canvas id="canvas"></canvas>
         </el-scrollbar>
+        <div class="slider-demo-block">
+            <el-slider v-model="value1" range :max="2000" @change="changeRange" />
+        </div>
     </div>
 </template>
 
-<style></style>
+<style scoped>
+.slider-demo-block {
+    display: flex;
+    align-items: center;
+    margin-right: 12px;
+}
+.slider-demo-block .el-slider {
+    margin-top: 0;
+    margin-left: 12px;
+}
+</style>

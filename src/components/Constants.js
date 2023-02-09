@@ -1,3 +1,5 @@
+export const FILE_COUNT = 20;
+
 export const colors = [
     "#FF0000",
     "#00FF00",
