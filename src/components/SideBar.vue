@@ -50,8 +50,8 @@ const displayTrajectoryChange = (id) => {
                             <br />
                             <el-switch
                                 v-model="switchValue[item.id]"
-                                active-text="Open"
-                                inactive-text="Close"
+                                active-text="Show"
+                                inactive-text="Hide"
                                 @change="displayTrajectoryChange(item.id)"
                             />
                         </el-collapse-item>

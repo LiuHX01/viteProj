@@ -1,4 +1,5 @@
 export const FILE_COUNT = 20;
+export const FRAME_LENGTH = 2000;
 
 export const colors = [
     "#FF0000",
