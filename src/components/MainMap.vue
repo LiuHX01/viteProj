@@ -21,6 +21,7 @@ const config = reactive({
         iconUrl: "/vehicle.svg",
         iconSize: [16, 16],
     }),
+    sliderRange: [0, 50],
 });
 
 const vehicles = reactive({ state: {}, move: {} });
@@ -55,7 +56,7 @@ const addVehicle = (id, initLatLng) => {
 };
 
 // 添加轨迹
-const addLine = (id) => {
+const addDynamicLine = (id) => {
     if (vehicles.state[id].isRunning) {
         if (vehicles.move[id].motion) {
             vehicles.move[id].motion.remove();
@@ -88,7 +89,7 @@ const addLine = (id) => {
         }
     }
     vehicles.move[id].timer = setTimeout(() => {
-        addLine(id);
+        addDynamicLine(id);
     }, config.duration);
 };
 
@@ -110,8 +111,9 @@ const toggleHandler = (id) => {
 };
 
 const changeRangeHandler = (range) => {
-    const start = range[0];
-    const end = range[1];
+    config.sliderRange = range;
+    const start = config.sliderRange[0];
+    const end = config.sliderRange[1];
 
     // 对于每一个载具
     for (let i in vehicles.state) {
@@ -135,7 +137,20 @@ const displayTrajectoryChangeHandler = (id) => {
     vehicles.state[id].displayTrajectory = !vehicles.state[id].displayTrajectory;
     if (!vehicles.state[id].displayTrajectory && vehicles.move[id].trajetory) {
         vehicles.move[id].trajetory.remove();
+    } else {
+        const start = config.sliderRange[0];
+        const end = config.sliderRange[1];
+        const realEnd = Math.min(end, vehicles.move[id].latLngList.length - 1);
+        const realLatLngList = vehicles.move[id].latLngList.slice(start, realEnd);
+        console.log(`display trajectory of vehicle ${id} in range ${start} to ${realEnd}`);
+
+        vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
+        vehicles.move[id].trajetory.addTo(config.map);
     }
+};
+
+const addStaticLine = () => {
+    // do something
 };
 
 onMounted(() => {
@@ -149,7 +164,7 @@ onMounted(() => {
                 const id = dataGroupByTime[i][j]["id"];
                 if (!vehicles.move[id] || !vehicles.state[id]) {
                     addVehicle(id, [lat, lng]);
-                    addLine(id);
+                    addDynamicLine(id);
                 } else {
                     vehicles.move[id].latLngList.push([lat, lng]);
                 }
