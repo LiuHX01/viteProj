@@ -1,6 +1,6 @@
 class MyWorker {
     constructor() {
-        this.worker = new Worker(new URL("./worker.js", import.meta.url));
+        this.worker = new Worker(new URL("./Worker.js", import.meta.url));
     }
 
     sendMsg(data, type, info = null) {
