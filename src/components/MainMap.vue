@@ -203,8 +203,10 @@ onMounted(() => {
                 const id = dataGroupByTime[i][j]["id"];
                 if (!vehicles.move[id] || !vehicles.state[id]) {
                     addVehicle(id, [lat, lng]);
-                    addDynamicLine(id);
                 } else {
+                    if (vehicles.move[id].latLngList.length === 2) {
+                        addDynamicLine(id);
+                    }
                     vehicles.move[id].latLngList.push([lat, lng]);
                 }
             }
