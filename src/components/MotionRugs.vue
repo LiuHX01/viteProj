@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from "vue";
 import { MotionAdaptor } from "./Adaptor";
 import { FRAME_LENGTH } from "./Constants.js";
+import { myWorker } from "./myWorker.js";
 
 const emit = defineEmits(["changeRange"]);
 

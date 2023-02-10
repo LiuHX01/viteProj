@@ -55,6 +55,7 @@ const addVehicle = (id, initLatLng) => {
         lastOne: null,
         lastTwo: null,
         recentLine: 1,
+        listener: null,
     };
 };
 
@@ -65,6 +66,8 @@ const handlelastLines = (id) => {
      * 修改线路1透明度
      * 设置线路2为新的最近
      */
+    const currFrame = vehicles.state[id].frame;
+    const currLatLng = vehicles.move[id].latLngList[currFrame];
     if (vehicles.move[id].recentLine === 1) {
         if (vehicles.move[id].lastTwo) {
             vehicles.move[id].lastTwo.remove();
@@ -73,10 +76,10 @@ const handlelastLines = (id) => {
         if (vehicles.move[id].lastOne) {
             vehicles.move[id].lastOne.setStyle({ opacity: 0.3 });
         }
-        vehicles.move[id].lastTwo = L.polyline(
-            [vehicles.move[id].motion.getLatLngs()[0], vehicles.move[id].motion.getLatLngs()[1]],
-            { color: getColorById(id), opacity: 0.6 }
-        ).addTo(config.map);
+        vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+            color: getColorById(id),
+            opacity: 0.6,
+        }).addTo(config.map);
     } else {
         if (vehicles.move[id].lastOne) {
             vehicles.move[id].lastOne.remove();
@@ -85,17 +88,19 @@ const handlelastLines = (id) => {
         if (vehicles.move[id].lastTwo) {
             vehicles.move[id].lastTwo.setStyle({ opacity: 0.2 });
         }
-        vehicles.move[id].lastOne = L.polyline(
-            [vehicles.move[id].motion.getLatLngs()[0], vehicles.move[id].motion.getLatLngs()[1]],
-            { color: getColorById(id), opacity: 0.5 }
-        ).addTo(config.map);
+        vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+            color: getColorById(id),
+            opacity: 0.5,
+        }).addTo(config.map);
     }
 };
 
 // 添加轨迹
 const addDynamicLine = (id) => {
     if (vehicles.state[id].isRunning) {
+        // 如果前面有运动，先清除
         if (vehicles.move[id].motion) {
+            // 处理最近的两条线
             handlelastLines(id);
 
             vehicles.move[id].motion.remove();
@@ -127,9 +132,6 @@ const addDynamicLine = (id) => {
             vehicles.state[id].frame++;
         }
     }
-    vehicles.move[id].timer = setTimeout(() => {
-        addDynamicLine(id);
-    }, config.duration);
 };
 
 // 轨迹颜色
@@ -188,10 +190,6 @@ const displayTrajectoryChangeHandler = (id) => {
     }
 };
 
-const addStaticLine = () => {
-    // do something
-};
-
 onMounted(() => {
     config.map = initMap();
 
@@ -202,12 +200,12 @@ onMounted(() => {
                 const lng = dataGroupByTime[i][j]["longitude"];
                 const id = dataGroupByTime[i][j]["id"];
                 if (!vehicles.move[id] || !vehicles.state[id]) {
-                    addVehicle(id, [lat, lng]);
+                    addVehicle(id, L.latLng(lat, lng));
                 } else {
                     if (vehicles.move[id].latLngList.length === 2) {
-                        addDynamicLine(id);
+                        vehicles.move[id].timer = setInterval(addDynamicLine, config.duration, id);
                     }
-                    vehicles.move[id].latLngList.push([lat, lng]);
+                    vehicles.move[id].latLngList.push(L.latLng(lat, lng));
                 }
             }
         }
