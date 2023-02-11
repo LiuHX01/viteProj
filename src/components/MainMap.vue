@@ -22,6 +22,8 @@ const config = reactive({
         iconSize: [16, 16],
     }),
     sliderRange: [0, 50],
+    opacityOne: 0.6,
+    opacityTwo: 0.3,
 });
 
 const vehicles = reactive({ state: {}, move: {} });
@@ -74,11 +76,11 @@ const handlelastLines = (id) => {
         }
         vehicles.move[id].recentLine = 2;
         if (vehicles.move[id].lastOne) {
-            vehicles.move[id].lastOne.setStyle({ opacity: 0.3 });
+            vehicles.move[id].lastOne.setStyle({ opacity: config.opacityTwo });
         }
         vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
             color: getColorById(id),
-            opacity: 0.6,
+            opacity: config.opacityOne,
         }).addTo(config.map);
     } else {
         if (vehicles.move[id].lastOne) {
@@ -86,11 +88,11 @@ const handlelastLines = (id) => {
         }
         vehicles.move[id].recentLine = 1;
         if (vehicles.move[id].lastTwo) {
-            vehicles.move[id].lastTwo.setStyle({ opacity: 0.2 });
+            vehicles.move[id].lastTwo.setStyle({ opacity: config.opacityTwo });
         }
         vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
             color: getColorById(id),
-            opacity: 0.5,
+            opacity: config.opacityOne,
         }).addTo(config.map);
     }
 };
@@ -221,17 +223,17 @@ onMounted(() => {
                     <div id="map"></div>
                 </div>
             </el-main>
-            <el-aside width="300px">
-                <SideBar
-                    :vstates="vehicles.state"
-                    @toggle="toggleHandler"
-                    @displayTrajectoryChange="displayTrajectoryChangeHandler"
-                ></SideBar>
-            </el-aside>
+            <el-footer>
+                <MotionRugs @changeRange="changeRangeHandler"></MotionRugs>
+            </el-footer>
         </el-container>
-        <el-footer>
-            <MotionRugs @changeRange="changeRangeHandler"></MotionRugs>
-        </el-footer>
+        <el-aside width="300px">
+            <SideBar
+                :vstates="vehicles.state"
+                @toggle="toggleHandler"
+                @displayTrajectoryChange="displayTrajectoryChangeHandler"
+            ></SideBar>
+        </el-aside>
     </el-container>
 </template>
 
