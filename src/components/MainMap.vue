@@ -9,9 +9,12 @@ import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors } from "./Constants.js";
+import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
+import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 
 const config = reactive({
     map: null,
+    mapSource: "Tencent.Normal.Map",
     latLng: [39.92641, 116.38876],
     zoom: 12,
     maxZoom: 18,
@@ -32,10 +35,15 @@ const vehicles = reactive({ state: {}, move: {} });
 const initMap = () => {
     const map = L.map("map", {
         renderer: L.canvas(),
+        fullscreenControl: true,
     }).setView(config.latLng, config.zoom);
 
     L.tileLayer
-        .chinaProvider("Tencent.Normal.Map", { zoom: config.zoom, maxZoom: config.maxZoom, minZoom: config.minZoom })
+        .chinaProvider(config.mapSource, {
+            zoom: config.zoom,
+            maxZoom: config.maxZoom,
+            minZoom: config.minZoom,
+        })
         .addTo(map);
 
     return map;
