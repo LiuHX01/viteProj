@@ -11,6 +11,8 @@ import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors } from "./Constants.js";
 import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
+import "leaflet-sidebar-v2/js/leaflet-sidebar.js";
+import "leaflet-sidebar-v2/css/leaflet-sidebar.css";
 
 const config = reactive({
     map: null,
@@ -34,8 +36,10 @@ const vehicles = reactive({ state: {}, move: {} });
 // 初始化地图
 const initMap = () => {
     const map = L.map("map", {
+        preferCanvas: true,
         renderer: L.canvas(),
         fullscreenControl: true,
+        attributionControl: false,
     }).setView(config.latLng, config.zoom);
 
     L.tileLayer
@@ -202,6 +206,17 @@ const displayTrajectoryChangeHandler = (id) => {
 
 onMounted(() => {
     config.map = initMap();
+    config.map.zoomControl.setPosition("topright");
+    const sidebar = L.control.sidebar({ container: "sidebar" }).addTo(config.map);
+    // const panelContent = {
+    //     id: "userinfo", // UID, used to access the panel
+    //     tab: "<div>123</div>", // content can be passed as HTML string,
+    //     pane: document.getElementById("panel").innerHTML, // DOM elements can be passed, too
+    //     // title: "Your Profile", // an optional pane header
+    //     position: "top", // optional vertical alignment, defaults to 'top'
+    // };
+    // sidebar.addPanel(panelContent);
+    // sidebar.open("userinfo");
 
     GPSAdaptor.DataListener((dataGroupByTime) => {
         for (let i in dataGroupByTime) {
@@ -228,20 +243,114 @@ onMounted(() => {
         <el-container>
             <el-main>
                 <div class="map_container">
-                    <div id="map"></div>
+                    <div id="map">
+                        <div id="sidebar" class="leaflet-sidebar collapsed">
+                            <div class="leaflet-sidebar-tabs">
+                                <!-- 靠上图标 -->
+                                <ul role="tablist">
+                                    <li>
+                                        <a href="#vehicleStatus" role="tab">
+                                            <img src="/shebeizhuangtai.svg" />
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#todo-1" role="tab">todo1</a>
+                                    </li>
+                                    <li>
+                                        <a href="#todo-2" role="tab">todo2</a>
+                                    </li>
+                                </ul>
+
+                                <!-- 靠下图标 -->
+                                <ul role="tablist">
+                                    <li>
+                                        <a href="#todo-97" role="tab">todo</a>
+                                    </li>
+                                    <li>
+                                        <a href="#todo-98" role="tab">todo</a>
+                                    </li>
+                                    <li>
+                                        <a href="#todo-99" role="tab">todo</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="leaflet-sidebar-content">
+                                <div class="leaflet-sidebar-pane" id="vehicleStatus">
+                                    <h1 class="leaflet-sidebar-header">
+                                        Vehicle Status
+                                        <div class="leaflet-sidebar-close">
+                                            <el-icon><DArrowLeft /></el-icon>
+                                        </div>
+                                    </h1>
+                                    <div style="margin-top: 10px">
+                                        <SideBar
+                                            :vstates="vehicles.state"
+                                            @toggle="toggleHandler"
+                                            @displayTrajectoryChange="displayTrajectoryChangeHandler"
+                                        ></SideBar>
+                                    </div>
+                                </div>
+
+                                <div class="leaflet-sidebar-pane" id="todo-1">
+                                    <h1 class="leaflet-sidebar-header">
+                                        todo-1
+                                        <div class="leaflet-sidebar-close">
+                                            <el-icon><DArrowLeft /></el-icon>
+                                        </div>
+                                    </h1>
+                                    <div style="margin-top: 20px">
+                                        <el-empty description="todo something... 1"></el-empty>
+                                    </div>
+                                </div>
+
+                                <div class="leaflet-sidebar-pane" id="todo-2">
+                                    <h1 class="leaflet-sidebar-header">
+                                        todo-2
+                                        <div class="leaflet-sidebar-close">
+                                            <el-icon><DArrowLeft /></el-icon>
+                                        </div>
+                                    </h1>
+                                    <div style="margin-top: 10px">
+                                        <el-empty description="todo something... 2"></el-empty>
+                                    </div>
+                                </div>
+                                <div class="leaflet-sidebar-pane" id="todo-97">
+                                    <h1 class="leaflet-sidebar-header">
+                                        todo-97
+                                        <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
+                                    </h1>
+                                </div>
+                                <div class="leaflet-sidebar-pane" id="todo-98">
+                                    <h1 class="leaflet-sidebar-header">
+                                        todo-98
+                                        <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
+                                    </h1>
+                                    <div style="margin-top: 10px">
+                                        <user-descriptions></user-descriptions>
+                                    </div>
+                                </div>
+                                <div class="leaflet-sidebar-pane" id="todo-99">
+                                    <h1 class="leaflet-sidebar-header">
+                                        todo-99
+                                        <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </el-main>
             <el-footer>
                 <MotionRugs @changeRange="changeRangeHandler"></MotionRugs>
             </el-footer>
         </el-container>
-        <el-aside width="300px">
-            <SideBar
+        <!-- <el-aside width="300px"> -->
+        <!-- <SideBar
                 :vstates="vehicles.state"
                 @toggle="toggleHandler"
                 @displayTrajectoryChange="displayTrajectoryChangeHandler"
-            ></SideBar>
-        </el-aside>
+            ></SideBar> -->
+        <!-- </el-aside> -->
     </el-container>
 </template>
 
@@ -268,5 +377,14 @@ onMounted(() => {
 }
 .el-footer {
     padding: 0 0;
+}
+
+/* #sidebar { */
+/* width: 300px; */
+/* height: 100%; */
+/* } */
+
+.leaflet-sidebar-close {
+    top: 2px;
 }
 </style>
