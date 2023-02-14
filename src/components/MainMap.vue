@@ -16,7 +16,7 @@ import "leaflet-sidebar-v2/css/leaflet-sidebar.css";
 
 const config = reactive({
     map: null,
-    mapSource: "Tencent.Normal.Map",
+    mapSource: "Geoq.Normal.Gray",
     latLng: [39.92641, 116.38876],
     zoom: 12,
     maxZoom: 18,

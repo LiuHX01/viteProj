@@ -287,7 +287,7 @@ onMounted(() => {
 
 <template>
     <div>
-        <el-scrollbar v-loading="load.loading" element-loading-background="rgba(36,36,36,1)">
+        <el-scrollbar v-loading="load.loading" element-loading-background="rgba(235,235,235,1)">
             <canvas id="canvas"></canvas>
         </el-scrollbar>
         <div class="slider-demo-block">
