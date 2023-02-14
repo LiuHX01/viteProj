@@ -38,7 +38,10 @@ const initMap = () => {
     const map = L.map("map", {
         preferCanvas: true,
         renderer: L.canvas(),
-        fullscreenControl: true,
+        // fullscreenControl: true,
+        // fullscreenControlOptions: {
+        //     position: "topright",
+        // },
         attributionControl: false,
     }).setView(config.latLng, config.zoom);
 
@@ -50,7 +53,7 @@ const initMap = () => {
         })
         .addTo(map);
 
-    return map;
+    config.map = map;
 };
 
 // 添加载具
@@ -205,18 +208,14 @@ const displayTrajectoryChangeHandler = (id) => {
 };
 
 onMounted(() => {
-    config.map = initMap();
+    initMap();
     config.map.zoomControl.setPosition("topright");
-    const sidebar = L.control.sidebar({ container: "sidebar" }).addTo(config.map);
-    // const panelContent = {
-    //     id: "userinfo", // UID, used to access the panel
-    //     tab: "<div>123</div>", // content can be passed as HTML string,
-    //     pane: document.getElementById("panel").innerHTML, // DOM elements can be passed, too
-    //     // title: "Your Profile", // an optional pane header
-    //     position: "top", // optional vertical alignment, defaults to 'top'
-    // };
-    // sidebar.addPanel(panelContent);
-    // sidebar.open("userinfo");
+    L.control.sidebar({ container: "sidebar" }).addTo(config.map);
+    L.control
+        .fullscreen({
+            position: "topright",
+        })
+        .addTo(config.map);
 
     GPSAdaptor.DataListener((dataGroupByTime) => {
         for (let i in dataGroupByTime) {
