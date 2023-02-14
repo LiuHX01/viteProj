@@ -72,7 +72,7 @@ const addVehicle = (id, initLatLng) => {
         lastOne: null,
         lastTwo: null,
         recentLine: 1,
-        listener: null,
+        displayTrails: true,
     };
 };
 
@@ -83,32 +83,41 @@ const handlelastLines = (id) => {
      * 修改线路1透明度
      * 设置线路2为新的最近
      */
-    const currFrame = vehicles.state[id].frame;
-    const currLatLng = vehicles.move[id].latLngList[currFrame];
-    if (vehicles.move[id].recentLine === 1) {
-        if (vehicles.move[id].lastTwo) {
-            vehicles.move[id].lastTwo.remove();
-        }
-        vehicles.move[id].recentLine = 2;
-        if (vehicles.move[id].lastOne) {
-            vehicles.move[id].lastOne.setStyle({ opacity: config.opacityTwo });
-        }
-        vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
-            color: getColorById(id),
-            opacity: config.opacityOne,
-        }).addTo(config.map);
-    } else {
+    if (!vehicles.move[id].displayTrails) {
         if (vehicles.move[id].lastOne) {
             vehicles.move[id].lastOne.remove();
         }
-        vehicles.move[id].recentLine = 1;
         if (vehicles.move[id].lastTwo) {
-            vehicles.move[id].lastTwo.setStyle({ opacity: config.opacityTwo });
+            vehicles.move[id].lastTwo.remove();
         }
-        vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
-            color: getColorById(id),
-            opacity: config.opacityOne,
-        }).addTo(config.map);
+    } else {
+        const currFrame = vehicles.state[id].frame;
+        const currLatLng = vehicles.move[id].latLngList[currFrame];
+        if (vehicles.move[id].recentLine === 1) {
+            if (vehicles.move[id].lastTwo) {
+                vehicles.move[id].lastTwo.remove();
+            }
+            vehicles.move[id].recentLine = 2;
+            if (vehicles.move[id].lastOne) {
+                vehicles.move[id].lastOne.setStyle({ opacity: config.opacityTwo });
+            }
+            vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+                color: getColorById(id),
+                opacity: config.opacityOne,
+            }).addTo(config.map);
+        } else {
+            if (vehicles.move[id].lastOne) {
+                vehicles.move[id].lastOne.remove();
+            }
+            vehicles.move[id].recentLine = 1;
+            if (vehicles.move[id].lastTwo) {
+                vehicles.move[id].lastTwo.setStyle({ opacity: config.opacityTwo });
+            }
+            vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+                color: getColorById(id),
+                opacity: config.opacityOne,
+            }).addTo(config.map);
+        }
     }
 };
 
@@ -207,6 +216,14 @@ const displayTrajectoryChangeHandler = (id) => {
     }
 };
 
+const switchDisplayTrails = (id) => {
+    if (id == "all") {
+        for (let i in vehicles.state) {
+            vehicles.move[i].displayTrails = !vehicles.move[i].displayTrails;
+        }
+    }
+};
+
 onMounted(() => {
     initMap();
     config.map.zoomControl.setPosition("topright");
@@ -253,7 +270,9 @@ onMounted(() => {
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#todo-1" role="tab">todo1</a>
+                                        <a href="#styleControl" role="tab">
+                                            <img src="/kongzhi.svg" />
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="#todo-2" role="tab">todo2</a>
@@ -290,15 +309,18 @@ onMounted(() => {
                                     </div>
                                 </div>
 
-                                <div class="leaflet-sidebar-pane" id="todo-1">
+                                <div class="leaflet-sidebar-pane" id="styleControl">
                                     <h1 class="leaflet-sidebar-header">
-                                        todo-1
+                                        Style Control
                                         <div class="leaflet-sidebar-close">
                                             <el-icon><DArrowLeft /></el-icon>
                                         </div>
                                     </h1>
                                     <div style="margin-top: 20px">
-                                        <el-empty description="todo something... 1"></el-empty>
+                                        <el-button type="primary" @click="switchDisplayTrails('all')">
+                                            Switch Display Trails
+                                        </el-button>
+                                        <!-- <el-empty description="todo something... 1"></el-empty> -->
                                     </div>
                                 </div>
 

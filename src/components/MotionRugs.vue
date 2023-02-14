@@ -262,7 +262,7 @@ onMounted(() => {
         canvas.width = ordered.length;
         canvas.height = ordered[0].length;
 
-        const img = ctx.createImageData(canvas.width, canvas.height);
+        const img = new ImageData(canvas.width, canvas.height);
         let da = img.data;
 
         console.time("draw");
@@ -272,10 +272,10 @@ onMounted(() => {
                 // ctx.fillRect(i, j, 1, 1);
                 const clr = hexColorToRGB(rugs.draw.getColor(ordered[i][j]["value"][currFeature]));
                 const idx = 4 * (i + j * canvas.width);
-                da[idx] = clr.r;
-                da[idx + 1] = clr.g;
-                da[idx + 2] = clr.b;
-                da[idx + 3] = 255;
+                img.data[idx] = clr.r;
+                img.data[idx + 1] = clr.g;
+                img.data[idx + 2] = clr.b;
+                img.data[idx + 3] = 255;
             }
         }
         console.timeEnd("draw");
