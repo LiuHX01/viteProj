@@ -1,7 +1,7 @@
 onmessage = (msg) => {
     const msgData = msg.data;
     if (msgData.type == "load") {
-        let finished = 0;
+        let finished = [];
         const cnt = msgData.info;
         for (let i = 1; i <= cnt; i++) {
             fetch(`https://raw.githubusercontent.com/LiuHX01/DataSets/main/spd${i}.csv`)
@@ -14,14 +14,23 @@ onmessage = (msg) => {
                         type: "load",
                         info: i,
                     });
-                    finished++;
-                    console.log(`fetch ${i}, ${finished} finished`);
+                    finished.push(i);
+                    console.log(`fetch ${i}, ${finished.length} finished`);
                 });
         }
     } else if ((msgData.type = "setPixel")) {
-        const { ordered, featureMins, featureMaxs, deciles, currFeature } = msgData.data;
+        const currFeature = msgData.info;
+        const dataSet = new MotionRugsDataSet(msgData.data);
+        let ordered = dataSet.getOrderedData("Hilbert");
+        const draw = new Draw(
+            ordered,
+            dataSet.getFeatureMins(currFeature),
+            dataSet.getFeatureMaxs(currFeature),
+            dataSet.getDeciles(currFeature),
+            currFeature
+        );
+
         let img = new ImageData(ordered.length, ordered[0].length);
-        const draw = new Draw(ordered, featureMins, featureMaxs, deciles, currFeature);
 
         for (let i = 0; i < ordered.length; i++) {
             for (let j = 0; j < ordered[i].length; j++) {
@@ -35,7 +44,7 @@ onmessage = (msg) => {
         }
 
         postMessage({
-            data: img,
+            data: { img: img, width: ordered.length, height: ordered[0].length },
             type: "setPixel",
             info: null,
         });
