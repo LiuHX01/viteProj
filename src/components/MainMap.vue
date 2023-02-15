@@ -1,6 +1,7 @@
 <script setup>
 import MotionRugs from "./MotionRugs.vue";
 import SideBar from "./SideBar.vue";
+import Settings from "./Settings.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { onMounted, reactive } from "vue";
@@ -19,8 +20,8 @@ const config = reactive({
     mapSource: "Geoq.Normal.Gray",
     latLng: [39.92641, 116.38876],
     zoom: 12,
-    maxZoom: 18,
-    minZoom: 5,
+    maxZoom: 14,
+    minZoom: 11,
     duration: 1000,
     icon: L.icon({
         iconUrl: "/vehicle.svg",
@@ -38,10 +39,6 @@ const initMap = () => {
     const map = L.map("map", {
         preferCanvas: true,
         renderer: L.canvas(),
-        // fullscreenControl: true,
-        // fullscreenControlOptions: {
-        //     position: "topright",
-        // },
         attributionControl: false,
     }).setView(config.latLng, config.zoom);
 
@@ -69,12 +66,10 @@ const addVehicle = (id, initLatLng) => {
         motion: null,
         timer: null,
         trajetory: null,
-        lastOne: null,
-        lastTwo: null,
-        recentLine: 1,
-        displayTrails: true,
+        motionOpacity: 1,
     };
     vehicles.smear[id] = {
+        displaySmear: true,
         smearList: [
             { line: null, opacity: 1 },
             { line: null, opacity: 1 },
@@ -86,7 +81,7 @@ const addVehicle = (id, initLatLng) => {
     };
 };
 
-const handlelastLines = (id) => {
+const handleSmear = (id) => {
     vehicles.smear[id].currSmear =
         vehicles.smear[id].currSmear == 0 ? vehicles.smear[id].smearCount - 1 : vehicles.smear[id].currSmear - 1;
 
@@ -124,49 +119,18 @@ const handlelastLines = (id) => {
             }
         }
     }
+};
 
-    /**
-     * 线路1是最近的，本次运动之后线路1会变成次近，此时线路2是多余的
-     * 移除线路2，修改标识符
-     * 修改线路1透明度
-     * 设置线路2为新的最近
-     */
-    // if (!vehicles.move[id].displayTrails) {
-    //     if (vehicles.move[id].lastOne) {
-    //         vehicles.move[id].lastOne.remove();
-    //     }
-    //     if (vehicles.move[id].lastTwo) {
-    //         vehicles.move[id].lastTwo.remove();
-    //     }
-    // } else {
-    //     const currFrame = vehicles.state[id].frame;
-    //     const currLatLng = vehicles.move[id].latLngList[currFrame];
-    //     if (vehicles.move[id].recentLine === 1) {
-    //         if (vehicles.move[id].lastTwo) {
-    //             vehicles.move[id].lastTwo.remove();
-    //         }
-    //         vehicles.move[id].recentLine = 2;
-    //         if (vehicles.move[id].lastOne) {
-    //             vehicles.move[id].lastOne.setStyle({ opacity: config.opacityTwo });
-    //         }
-    //         vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
-    //             color: getColorById(id),
-    //             opacity: config.opacityOne,
-    //         }).addTo(config.map);
-    //     } else {
-    //         if (vehicles.move[id].lastOne) {
-    //             vehicles.move[id].lastOne.remove();
-    //         }
-    //         vehicles.move[id].recentLine = 1;
-    //         if (vehicles.move[id].lastTwo) {
-    //             vehicles.move[id].lastTwo.setStyle({ opacity: config.opacityTwo });
-    //         }
-    //         vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
-    //             color: getColorById(id),
-    //             opacity: config.opacityOne,
-    //         }).addTo(config.map);
-    //     }
-    // }
+const displaySmearChangeHandler = (isDisplay) => {
+    if (isDisplay) {
+        for (let i in vehicles.smear) {
+            vehicles.smear[i].displaySmear = true;
+        }
+    } else {
+        for (let i in vehicles.smear) {
+            vehicles.smear[i].displaySmear = false;
+        }
+    }
 };
 
 // 添加轨迹
@@ -174,8 +138,15 @@ const addDynamicLine = (id) => {
     if (vehicles.state[id].isRunning) {
         // 如果前面有运动，先清除
         if (vehicles.move[id].motion) {
-            // 处理最近的两条线
-            handlelastLines(id);
+            if (vehicles.smear[id].displaySmear) {
+                handleSmear(id);
+            } else {
+                for (let i = 0; i < vehicles.smear[id].smearList.length; i++) {
+                    if (vehicles.smear[id].smearList[i].line) {
+                        vehicles.smear[id].smearList[i].line.remove();
+                    }
+                }
+            }
 
             vehicles.move[id].motion.remove();
             vehicles.state[id].isRunning = false;
@@ -189,7 +160,7 @@ const addDynamicLine = (id) => {
                 .polyline(
                     [currLatLng, nextLatLng],
                     {
-                        color: getColorById(id),
+                        color: vehicles.smear[id].displaySmear ? getColorById(id) : "transparent",
                     },
                     {
                         auto: true,
@@ -261,14 +232,6 @@ const displayTrajectoryChangeHandler = (id) => {
 
         vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
         vehicles.move[id].trajetory.addTo(config.map);
-    }
-};
-
-const switchDisplayTrails = (id) => {
-    if (id == "all") {
-        for (let i in vehicles.state) {
-            vehicles.move[i].displayTrails = !vehicles.move[i].displayTrails;
-        }
     }
 };
 
@@ -366,11 +329,8 @@ onMounted(() => {
                                             <el-icon><DArrowLeft /></el-icon>
                                         </div>
                                     </h1>
-                                    <div style="margin-top: 20px">
-                                        <el-button type="primary" @click="switchDisplayTrails('all')">
-                                            Switch Display Trails
-                                        </el-button>
-                                        <!-- <el-empty description="todo something... 1"></el-empty> -->
+                                    <div style="margin-top: 10px">
+                                        <Settings @displaySmearChange="displaySmearChangeHandler"></Settings>
                                     </div>
                                 </div>
 

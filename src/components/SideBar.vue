@@ -20,17 +20,6 @@ const displayTrajectoryChange = (id) => {
 <template>
     <el-scrollbar height="100%">
         <el-collapse v-model="collapseActiveName">
-            <!-- <el-collapse-item name="all">
-                <template #title>
-                    <el-icon><Van /></el-icon>
-                    &nbsp;&nbsp;|&nbsp;&nbsp; Control All
-                </template>
-                <el-button type="primary" @click="toggle('all')">
-                    <el-icon><VideoPause /></el-icon>
-                    &nbsp;&nbsp;/&nbsp;&nbsp;
-                    <el-icon><VideoPlay /></el-icon>
-                </el-button>
-            </el-collapse-item> -->
             <div v-for="item in vstates">
                 <el-collapse-item>
                     <template #title>
