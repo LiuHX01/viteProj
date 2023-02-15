@@ -5,10 +5,12 @@ const emit = defineEmits(["displaySmearChange"]);
 
 const displaySmearValue = ref(true);
 const displaySmearChange = (isDisplay) => {
+    disableDisplaySmearLengthChange.value = !disableDisplaySmearLengthChange.value;
     emit("displaySmearChange", isDisplay);
 };
 
 const displaySmearLengthValue = ref(2);
+const disableDisplaySmearLengthChange = ref(false);
 const displaySmearLengthChange = (length) => {
     emit("displaySmearLengthChange", length);
 };
@@ -36,6 +38,7 @@ const displaySmearLengthChange = (length) => {
                         :min="1"
                         :max="5"
                         size="small"
+                        :disabled="disableDisplaySmearLengthChange"
                         @change="displaySmearLengthChange"
                     />
                 </span>
