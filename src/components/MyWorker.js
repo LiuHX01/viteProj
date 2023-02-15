@@ -4,6 +4,7 @@ class MyWorker {
     }
 
     sendMsg(data, type, info = null) {
+        console.log("Sending message to worker: ", data, type, info);
         this.worker.postMessage({
             data: data,
             type: type,

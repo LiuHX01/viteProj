@@ -266,7 +266,9 @@ onMounted(() => {
                                 <ul role="tablist">
                                     <li>
                                         <a href="#vehicleStatus" role="tab">
+                                            <!-- <el-badge is-dot :value="12"> -->
                                             <img src="/shebeizhuangtai.svg" />
+                                            <!-- </el-badge> -->
                                         </a>
                                     </li>
                                     <li>

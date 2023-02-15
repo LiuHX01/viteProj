@@ -212,10 +212,10 @@ class BinnedPercentileColorMapper {
     }
 }
 
-const rugs = reactive({
+const rugs = {
     dataSet: null,
     draw: null,
-});
+};
 const load = reactive({
     loading: true,
 });
@@ -262,25 +262,24 @@ onMounted(() => {
         canvas.width = ordered.length;
         canvas.height = ordered[0].length;
 
-        const img = new ImageData(canvas.width, canvas.height);
-        let da = img.data;
-
         console.time("draw");
-        for (let i = 0; i < ordered.length; i++) {
-            for (let j = 0; j < ordered[i].length; j++) {
-                // ctx.fillStyle = rugs.draw.getColor(ordered[i][j]["value"][currFeature]);
-                // ctx.fillRect(i, j, 1, 1);
-                const clr = hexColorToRGB(rugs.draw.getColor(ordered[i][j]["value"][currFeature]));
-                const idx = 4 * (i + j * canvas.width);
-                img.data[idx] = clr.r;
-                img.data[idx + 1] = clr.g;
-                img.data[idx + 2] = clr.b;
-                img.data[idx + 3] = 255;
+
+        myWorker.sendMsg(
+            {
+                ordered: ordered,
+                featureMins: rugs.dataSet.getFeatureMins(currFeature),
+                featureMaxs: rugs.dataSet.getFeatureMaxs(currFeature),
+                deciles: rugs.dataSet.getDeciles(currFeature),
+                currFeature: currFeature,
+            },
+            "setPixel"
+        );
+        myWorker.onMsg((msg) => {
+            if (msg.type === "setPixel") {
+                ctx.putImageData(msg.data, 0, 0);
+                load.loading = false;
             }
-        }
-        console.timeEnd("draw");
-        ctx.putImageData(img, 0, 0);
-        load.loading = false;
+        });
     });
 });
 </script>
