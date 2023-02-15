@@ -31,7 +31,7 @@ const config = reactive({
     opacityTwo: 0.3,
 });
 
-const vehicles = reactive({ state: {}, move: {} });
+const vehicles = reactive({ state: {}, move: {}, smear: {} });
 
 // 初始化地图
 const initMap = () => {
@@ -74,51 +74,99 @@ const addVehicle = (id, initLatLng) => {
         recentLine: 1,
         displayTrails: true,
     };
+    vehicles.smear[id] = {
+        smearList: [
+            { line: null, opacity: 1 },
+            { line: null, opacity: 1 },
+        ],
+        smearCount: 2,
+        currSmear: 1,
+        currOpacity: 0.7,
+        opacityGap: 0.3,
+    };
 };
 
 const handlelastLines = (id) => {
+    vehicles.smear[id].currSmear =
+        vehicles.smear[id].currSmear == 0 ? vehicles.smear[id].smearCount - 1 : vehicles.smear[id].currSmear - 1;
+
+    if (vehicles.smear[id].smearList.length < vehicles.smear[id].smearCount) {
+        for (let i = vehicles.smear[id].smearList.length; i < vehicles.smear[id].smearCount; i++) {
+            vehicles.smear[id].smearList.push({ line: null, opacity: 1 });
+        }
+    }
+
+    for (let i = 0; i < vehicles.smear[id].smearList.length; i++) {
+        if (i >= vehicles.smear[id].smearCount) {
+            // 移除多余的线
+            if (vehicles.smear[id].smearList[i].line) {
+                vehicles.smear[id].smearList[i].line.remove();
+            }
+        } else if (i == vehicles.smear[id].currSmear) {
+            // 末端移到最前成为最近的线
+            if (vehicles.smear[id].smearList[i].line) {
+                vehicles.smear[id].smearList[i].line.remove();
+            }
+            const currLatLng = vehicles.move[id].latLngList[vehicles.state[id].frame];
+            vehicles.smear[id].smearList[i].opacity = vehicles.smear[id].currOpacity;
+            vehicles.smear[id].smearList[i].line = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+                color: getColorById(id),
+                opacity: vehicles.smear[id].currOpacity,
+            }).addTo(config.map);
+        } else {
+            // 其他线透明度减少
+            if (vehicles.smear[id].smearList[i].line) {
+                const prevOpacity = vehicles.smear[id].smearList[i].opacity;
+                vehicles.smear[id].smearList[i].line.setStyle({
+                    opacity: prevOpacity - vehicles.smear[id].opacityGap,
+                });
+                vehicles.smear[id].smearList[i].opacity = prevOpacity - vehicles.smear[id].opacityGap;
+            }
+        }
+    }
+
     /**
      * 线路1是最近的，本次运动之后线路1会变成次近，此时线路2是多余的
      * 移除线路2，修改标识符
      * 修改线路1透明度
      * 设置线路2为新的最近
      */
-    if (!vehicles.move[id].displayTrails) {
-        if (vehicles.move[id].lastOne) {
-            vehicles.move[id].lastOne.remove();
-        }
-        if (vehicles.move[id].lastTwo) {
-            vehicles.move[id].lastTwo.remove();
-        }
-    } else {
-        const currFrame = vehicles.state[id].frame;
-        const currLatLng = vehicles.move[id].latLngList[currFrame];
-        if (vehicles.move[id].recentLine === 1) {
-            if (vehicles.move[id].lastTwo) {
-                vehicles.move[id].lastTwo.remove();
-            }
-            vehicles.move[id].recentLine = 2;
-            if (vehicles.move[id].lastOne) {
-                vehicles.move[id].lastOne.setStyle({ opacity: config.opacityTwo });
-            }
-            vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
-                color: getColorById(id),
-                opacity: config.opacityOne,
-            }).addTo(config.map);
-        } else {
-            if (vehicles.move[id].lastOne) {
-                vehicles.move[id].lastOne.remove();
-            }
-            vehicles.move[id].recentLine = 1;
-            if (vehicles.move[id].lastTwo) {
-                vehicles.move[id].lastTwo.setStyle({ opacity: config.opacityTwo });
-            }
-            vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
-                color: getColorById(id),
-                opacity: config.opacityOne,
-            }).addTo(config.map);
-        }
-    }
+    // if (!vehicles.move[id].displayTrails) {
+    //     if (vehicles.move[id].lastOne) {
+    //         vehicles.move[id].lastOne.remove();
+    //     }
+    //     if (vehicles.move[id].lastTwo) {
+    //         vehicles.move[id].lastTwo.remove();
+    //     }
+    // } else {
+    //     const currFrame = vehicles.state[id].frame;
+    //     const currLatLng = vehicles.move[id].latLngList[currFrame];
+    //     if (vehicles.move[id].recentLine === 1) {
+    //         if (vehicles.move[id].lastTwo) {
+    //             vehicles.move[id].lastTwo.remove();
+    //         }
+    //         vehicles.move[id].recentLine = 2;
+    //         if (vehicles.move[id].lastOne) {
+    //             vehicles.move[id].lastOne.setStyle({ opacity: config.opacityTwo });
+    //         }
+    //         vehicles.move[id].lastTwo = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+    //             color: getColorById(id),
+    //             opacity: config.opacityOne,
+    //         }).addTo(config.map);
+    //     } else {
+    //         if (vehicles.move[id].lastOne) {
+    //             vehicles.move[id].lastOne.remove();
+    //         }
+    //         vehicles.move[id].recentLine = 1;
+    //         if (vehicles.move[id].lastTwo) {
+    //             vehicles.move[id].lastTwo.setStyle({ opacity: config.opacityTwo });
+    //         }
+    //         vehicles.move[id].lastOne = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
+    //             color: getColorById(id),
+    //             opacity: config.opacityOne,
+    //         }).addTo(config.map);
+    //     }
+    // }
 };
 
 // 添加轨迹
@@ -349,7 +397,7 @@ onMounted(() => {
                                         <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
                                     </h1>
                                     <div style="margin-top: 10px">
-                                        <user-descriptions></user-descriptions>
+                                        <!-- <user-descriptions></user-descriptions> -->
                                     </div>
                                 </div>
                                 <div class="leaflet-sidebar-pane" id="todo-99">
