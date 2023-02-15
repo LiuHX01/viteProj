@@ -1,4 +1,4 @@
-export const FILE_COUNT = 5;
+export const FILE_COUNT = 90;
 export const FRAME_LENGTH = 2000;
 
 export const colors = [
