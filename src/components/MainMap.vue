@@ -143,6 +143,31 @@ const displaySmearChangeHandler = (isDisplay) => {
     }
 };
 
+const displaySmearLengthChangeHandler = (length) => {
+    removeAllSmear();
+    for (let i in vehicles.smear) {
+        vehicles.smear[i].smearCount = length;
+        vehicles.smear[i].currOpacity = 0.4 + length * 0.1;
+        if (length == 5 || length == 4) {
+            vehicles.smear[i].opacityGap = 0.2;
+        } else if (length == 3 || length == 2) {
+            vehicles.smear[i].opacityGap = 0.3;
+        } else if (length == 1) {
+            vehicles.smear[i].opacityGap = 0.4;
+        }
+    }
+};
+
+const removeAllSmear = () => {
+    for (let i in vehicles.smear) {
+        for (let j = 0; j < vehicles.smear[i].smearList.length; j++) {
+            if (vehicles.smear[i].smearList[j].line) {
+                vehicles.smear[i].smearList[j].line.remove();
+            }
+        }
+    }
+};
+
 // 添加轨迹
 const addDynamicLine = (id) => {
     if (vehicles.state[id].isRunning) {
@@ -340,7 +365,10 @@ onMounted(() => {
                                         </div>
                                     </h1>
                                     <div style="margin-top: 10px">
-                                        <Settings @displaySmearChange="displaySmearChangeHandler"></Settings>
+                                        <Settings
+                                            @displaySmearChange="displaySmearChangeHandler"
+                                            @displaySmearLengthChange="displaySmearLengthChangeHandler"
+                                        ></Settings>
                                     </div>
                                 </div>
 

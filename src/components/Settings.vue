@@ -7,6 +7,11 @@ const displaySmearValue = ref(true);
 const displaySmearChange = (isDisplay) => {
     emit("displaySmearChange", isDisplay);
 };
+
+const displaySmearLengthValue = ref(2);
+const displaySmearLengthChange = (length) => {
+    emit("displaySmearLengthChange", length);
+};
 </script>
 
 <template>
@@ -19,9 +24,21 @@ const displaySmearChange = (isDisplay) => {
         <div class="card-content">
             <div class="card-item">
                 <span class="setting-content">Display Smears</span>
-                <span class="setting-switch"
-                    ><el-switch v-model="displaySmearValue" @change="displaySmearChange"
-                /></span>
+                <span class="setting-control">
+                    <el-switch v-model="displaySmearValue" @change="displaySmearChange" />
+                </span>
+            </div>
+            <div class="card-item">
+                <span class="setting-content">Smear Length</span>
+                <span class="setting-control">
+                    <el-input-number
+                        v-model="displaySmearLengthValue"
+                        :min="1"
+                        :max="5"
+                        size="small"
+                        @change="displaySmearLengthChange"
+                    />
+                </span>
             </div>
         </div>
     </el-card>
@@ -29,10 +46,10 @@ const displaySmearChange = (isDisplay) => {
 
 <style scoped>
 .card-item {
-    height: 32px;
-    line-height: 32px;
+    height: 40px;
+    line-height: 40px;
 }
-.setting-switch {
+.setting-control {
     float: right;
 }
 </style>
