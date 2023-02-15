@@ -129,6 +129,16 @@ const displaySmearChangeHandler = (isDisplay) => {
     } else {
         for (let i in vehicles.smear) {
             vehicles.smear[i].displaySmear = false;
+            if (!vehicles.state[i].isRunning) {
+                for (let j = 0; j < vehicles.smear[i].smearList.length; j++) {
+                    if (vehicles.smear[i].smearList[j].line) {
+                        vehicles.smear[i].smearList[j].line.remove();
+                    }
+                }
+                if (vehicles.move[i].motion) {
+                    vehicles.move[i].motion.setStyle({ color: "transparent" });
+                }
+            }
         }
     }
 };
