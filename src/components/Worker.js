@@ -21,7 +21,8 @@ onmessage = (msg) => {
     } else if ((msgData.type = "setPixel")) {
         const currFeature = msgData.info;
         const dataSet = new MotionRugsDataSet(msgData.data);
-        let ordered = dataSet.getOrderedData("Hilbert");
+        // let ordered = dataSet.getOrderedData("Hilbert");
+        let ordered = dataSet.getOrderedData("zOrder");
         const draw = new Draw(
             ordered,
             dataSet.getFeatureMins(currFeature),
@@ -130,7 +131,7 @@ const PointQuadTree = (unsorted) => {
     // TODO: implement
 };
 
-const ZOrderCurveStrategy = (unsorted) => {
+const zOrderCurveStrategy = (unsorted) => {
     const MortonTable256 = [
         0x0000, 0x0001, 0x0004, 0x0005, 0x0010, 0x0011, 0x0014, 0x0015, 0x0040, 0x0041, 0x0044, 0x0045, 0x0050, 0x0051,
         0x0054, 0x0055, 0x0100, 0x0101, 0x0104, 0x0105, 0x0110, 0x0111, 0x0114, 0x0115, 0x0140, 0x0141, 0x0144, 0x0145,
@@ -258,6 +259,9 @@ class MotionRugsDataSet {
     getOrderedData(strategyName) {
         if (strategyName === "Hilbert") {
             this.orderedDataSet = HilbertCurveStrategy(this.baseData);
+            return this.orderedDataSet;
+        } else if (strategyName === "zOrder") {
+            this.orderedDataSet = zOrderCurveStrategy(this.baseData);
             return this.orderedDataSet;
         }
     }
