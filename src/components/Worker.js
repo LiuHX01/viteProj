@@ -19,35 +19,38 @@ onmessage = (msg) => {
                 });
         }
     } else if ((msgData.type = "setPixel")) {
+        const strategyNames = ["Hilbert", "zOrder"];
         const currFeature = msgData.info;
         const dataSet = new MotionRugsDataSet(msgData.data);
-        // let ordered = dataSet.getOrderedData("Hilbert");
-        let ordered = dataSet.getOrderedData("zOrder");
-        const draw = new Draw(
-            ordered,
-            dataSet.getFeatureMins(currFeature),
-            dataSet.getFeatureMaxs(currFeature),
-            dataSet.getDeciles(currFeature),
-            currFeature
-        );
 
-        let img = new ImageData(ordered.length, ordered[0].length);
+        strategyNames.forEach((strategyName) => {
+            let ordered = dataSet.getOrderedData(strategyName);
+            const draw = new Draw(
+                ordered,
+                dataSet.getFeatureMins(currFeature),
+                dataSet.getFeatureMaxs(currFeature),
+                dataSet.getDeciles(currFeature),
+                currFeature
+            );
 
-        for (let i = 0; i < ordered.length; i++) {
-            for (let j = 0; j < ordered[i].length; j++) {
-                const clr = hexColorToRGB(draw.getColor(ordered[i][j]["value"][currFeature]));
-                const idx = 4 * (i + j * ordered.length);
-                img.data[idx] = clr.r;
-                img.data[idx + 1] = clr.g;
-                img.data[idx + 2] = clr.b;
-                img.data[idx + 3] = 255;
+            let img = new ImageData(ordered.length, ordered[0].length);
+
+            for (let i = 0; i < ordered.length; i++) {
+                for (let j = 0; j < ordered[i].length; j++) {
+                    const clr = hexColorToRGB(draw.getColor(ordered[i][j]["value"][currFeature]));
+                    const idx = 4 * (i + j * ordered.length);
+                    img.data[idx] = clr.r;
+                    img.data[idx + 1] = clr.g;
+                    img.data[idx + 2] = clr.b;
+                    img.data[idx + 3] = 255;
+                }
             }
-        }
 
-        postMessage({
-            data: { img: img, width: ordered.length, height: ordered[0].length },
-            type: "setPixel",
-            info: null,
+            postMessage({
+                data: { img: img, width: ordered.length, height: ordered[0].length },
+                type: "setPixel",
+                info: strategyName,
+            });
         });
     }
 };
