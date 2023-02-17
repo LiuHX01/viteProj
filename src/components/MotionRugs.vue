@@ -79,8 +79,21 @@ onMounted(() => {
             <el-select v-model="strategyValue" class="m-2" placeholder="Select" @change="changeStrategy">
                 <el-option v-for="item in strategyOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
-            <el-slider v-model="value1" range :max="FRAME_LENGTH" @change="changeRange" />
-            <el-switch v-model="fullScreenValue" @change="fullScreenChange" />
+            <el-slider
+                style="padding-left: 10px; padding-right: 10px"
+                v-model="value1"
+                range
+                :max="FRAME_LENGTH"
+                @change="changeRange"
+            />
+            <el-switch
+                v-model="fullScreenValue"
+                @change="fullScreenChange"
+                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                inline-prompt
+                active-text="已全屏"
+                inactive-text="非全屏"
+            />
         </div>
     </div>
 </template>
