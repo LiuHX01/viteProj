@@ -4,7 +4,7 @@ import { MotionAdaptor } from "./Adaptor";
 import { FRAME_LENGTH } from "./Constants.js";
 import { myWorker } from "./MyWorker.js";
 
-const emit = defineEmits(["changeRange"]);
+const emit = defineEmits(["changeRange", "fullScreenChange"]);
 
 const load = reactive({
     loading: true,
@@ -36,6 +36,13 @@ const changeStrategy = (strategyName) => {
         }
     }
 };
+
+const fullScreenValue = ref(false);
+
+const fullScreenChange = (value) => {
+    emit("fullScreenChange", value);
+};
+
 onMounted(() => {
     canvasItem.canvas = document.getElementById("canvas");
     canvasItem.ctx = canvas.getContext("2d");
@@ -64,7 +71,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
+    <div id="motionrug-container">
         <el-scrollbar v-loading="load.loading" element-loading-background="rgba(235,235,235,1)">
             <canvas id="canvas"></canvas>
         </el-scrollbar>
@@ -73,11 +80,15 @@ onMounted(() => {
                 <el-option v-for="item in strategyOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
             <el-slider v-model="value1" range :max="FRAME_LENGTH" @change="changeRange" />
+            <el-switch v-model="fullScreenValue" @change="fullScreenChange" />
         </div>
     </div>
 </template>
 
 <style scoped>
+#motionrug-container {
+    background-color: #fff;
+}
 .slider-demo-block {
     display: flex;
     align-items: center;

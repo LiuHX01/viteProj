@@ -130,7 +130,11 @@ const HilbertCurveStrategy = (unsorted) => {
     return result;
 };
 
-const PointQuadTree = (unsorted) => {
+const pointQuadTreeStrategy = (unsorted) => {
+    // TODO: implement
+};
+
+const rTreeStrategy = (unsorted) => {
     // TODO: implement
 };
 
