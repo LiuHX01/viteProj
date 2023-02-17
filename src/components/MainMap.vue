@@ -311,12 +311,16 @@ const findVehicleHandler = (id) => {
         iconUrl: "/aim.svg",
         iconSize: [24, 24],
     });
-    vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
+    if (vehicles.move[id].motion) {
+        vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
+    }
     vehicles.move[id].icon = aimIcon;
     setTimeout(() => {
-        vehicles.move[id].motion.getMarkers()[0].setIcon(config.icon);
+        if (vehicles.move[id].motion) {
+            vehicles.move[id].motion.getMarkers()[0].setIcon(config.icon);
+        }
         vehicles.move[id].icon = config.icon;
-    }, 1000);
+    }, 2000);
 };
 
 onMounted(() => {

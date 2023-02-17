@@ -91,8 +91,8 @@ onMounted(() => {
                 @change="fullScreenChange"
                 style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                 inline-prompt
-                active-text="已全屏"
-                inactive-text="非全屏"
+                active-text="全屏开"
+                inactive-text="全屏关"
             />
         </div>
     </div>
