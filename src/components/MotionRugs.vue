@@ -14,10 +14,53 @@ const value1 = ref([0, 50]);
 const canvasItem = {
     canvas: null,
     ctx: null,
+    highlight: false,
+};
+
+const pixelHighlightValue = ref(false);
+
+const pixelHighlightChange = (value) => {
+    if (value) {
+        drawMask(value1.value[0], value1.value[1]);
+    } else {
+        if (canvasItem.ctx) {
+            canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
+            canvasItem.ctx.putImageData(strategyImgs[strategyValue.value], 0, 0);
+            canvasItem.highlight = false;
+        }
+    }
 };
 
 const changeRange = (range) => {
     emit("changeRange", range);
+    if (pixelHighlightValue.value) {
+        drawMask(range[0], range[1]);
+    }
+};
+
+const drawMask = (start, end) => {
+    if (canvasItem.ctx) {
+        if (canvasItem.highlight) {
+            canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
+            canvasItem.ctx.putImageData(strategyImgs[strategyValue.value], 0, 0);
+            canvasItem.highlight = false;
+        }
+        const frontX = 0;
+        const frontY = 0;
+        const frontWidth = start;
+        const frontHeight = canvasItem.canvas.height;
+        canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        canvasItem.ctx.fillRect(frontX, frontY, frontWidth, frontHeight);
+
+        const backX = end;
+        const backY = 0;
+        const backWidth = canvasItem.canvas.width - end;
+        const backHeight = canvasItem.canvas.height;
+        canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        canvasItem.ctx.fillRect(backX, backY, backWidth, backHeight);
+
+        canvasItem.highlight = true;
+    }
 };
 
 const strategyValue = ref("Hilbert");
@@ -79,6 +122,15 @@ onMounted(() => {
             <el-select v-model="strategyValue" class="m-2" placeholder="Select" @change="changeStrategy">
                 <el-option v-for="item in strategyOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
+            &nbsp;&nbsp;
+            <el-switch
+                v-model="pixelHighlightValue"
+                @change="pixelHighlightChange"
+                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                inline-prompt
+                active-text="mask开"
+                inactive-text="mask关"
+            />
             <el-slider
                 style="padding-left: 10px; padding-right: 10px"
                 v-model="value1"
@@ -105,6 +157,7 @@ onMounted(() => {
 .slider-demo-block {
     display: flex;
     align-items: center;
+    margin-left: 12px;
     margin-right: 12px;
 }
 .slider-demo-block .el-slider {
