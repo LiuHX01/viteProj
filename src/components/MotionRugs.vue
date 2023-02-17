@@ -75,6 +75,9 @@ const changeStrategy = (strategyName) => {
         if (strategyImgs[strategyName]) {
             canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
             canvasItem.ctx.putImageData(strategyImgs[strategyName], 0, 0);
+            if (pixelHighlightValue.value) {
+                drawMask(value1.value[0], value1.value[1]);
+            }
         } else {
             console.log("no such strategy");
         }
