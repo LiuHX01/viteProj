@@ -73,6 +73,7 @@ const changeStrategy = (strategyName) => {
     console.log(`change strategy to ${strategyName}`);
     if (canvasItem.ctx) {
         if (strategyImgs[strategyName]) {
+            canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
             canvasItem.ctx.putImageData(strategyImgs[strategyName], 0, 0);
         } else {
             console.log("no such strategy");
