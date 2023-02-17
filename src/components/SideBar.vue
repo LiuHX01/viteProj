@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { FILE_COUNT } from "./Constants.js";
 
 const props = defineProps(["vstates"]);
-const emit = defineEmits(["toggle", "displayTrajectoryChange"]);
+const emit = defineEmits(["toggle", "displayTrajectoryChange", "findVehicle"]);
 
 const collapseActiveName = ref([""]);
 const switchValue = ref(new Array(FILE_COUNT).fill(false));
@@ -14,6 +14,10 @@ const toggle = (id) => {
 
 const displayTrajectoryChange = (id) => {
     emit("displayTrajectoryChange", id);
+};
+
+const findVehicle = (id) => {
+    emit("findVehicle", id);
 };
 </script>
 
@@ -30,9 +34,11 @@ const displayTrajectoryChange = (id) => {
                     <el-button v-if="item.isRunning" type="primary" @click="toggle(item.id)">
                         <el-icon><VideoPause /></el-icon>
                     </el-button>
-                    <el-button v-else type="primary" @click="toggle(item.id)">
+                    <el-button v-else type="warning" @click="toggle(item.id)">
                         <el-icon><VideoPlay /></el-icon>
                     </el-button>
+                    <br />
+                    <el-button type="info" @click="findVehicle(item.id)">Lock</el-button>
                     <br />
                     <el-switch
                         v-model="switchValue[item.id]"

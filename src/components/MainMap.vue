@@ -67,6 +67,7 @@ const addVehicle = (id, initLatLng) => {
         timer: null,
         trajetory: null,
         motionOpacity: 1,
+        icon: config.icon,
     };
     vehicles.smear[id] = {
         displaySmear: true,
@@ -205,7 +206,7 @@ const addDynamicLine = (id) => {
                     {
                         removeOnEnd: false,
                         showMarker: true,
-                        icon: config.icon,
+                        icon: vehicles.move[id].icon,
                     }
                 )
                 .addTo(config.map);
@@ -302,6 +303,22 @@ const fullScreenChangeHandler = (value) => {
     }
 };
 
+const findVehicleHandler = (id) => {
+    const latLng = vehicles.move[id].latLngList[vehicles.state[id].frame];
+    config.map.setView(latLng, config.map.getZoom());
+
+    const aimIcon = L.icon({
+        iconUrl: "/aim.svg",
+        iconSize: [24, 24],
+    });
+    vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
+    vehicles.move[id].icon = aimIcon;
+    setTimeout(() => {
+        vehicles.move[id].motion.getMarkers()[0].setIcon(config.icon);
+        vehicles.move[id].icon = config.icon;
+    }, 1000);
+};
+
 onMounted(() => {
     initMap();
     config.map.zoomControl.setPosition("topright");
@@ -385,6 +402,7 @@ onMounted(() => {
                                             :vstates="vehicles.state"
                                             @toggle="toggleHandler"
                                             @displayTrajectoryChange="displayTrajectoryChangeHandler"
+                                            @findVehicle="findVehicleHandler"
                                         ></SideBar>
                                     </div>
                                 </div>
