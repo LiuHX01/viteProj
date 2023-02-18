@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
-import "leaflet.chinatmsproviders";
+// import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors } from "./Constants.js";
@@ -42,8 +42,14 @@ const initMap = () => {
         attributionControl: false,
     }).setView(config.latLng, config.zoom);
 
+    /*
+    https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
+    https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}
+    https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png
+    https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png
+    */
     L.tileLayer
-        .chinaProvider(config.mapSource, {
+        .canvas("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
             zoom: config.zoom,
             maxZoom: config.maxZoom,
             minZoom: config.minZoom,
