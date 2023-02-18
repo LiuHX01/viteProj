@@ -14,6 +14,8 @@ import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import "leaflet-sidebar-v2/js/leaflet-sidebar.js";
 import "leaflet-sidebar-v2/css/leaflet-sidebar.css";
+import "leaflet-switch-basemap/src/L.switchBasemap.js";
+import "leaflet-switch-basemap/src/L.switchBasemap.css";
 
 const config = reactive({
     map: null,
@@ -48,19 +50,57 @@ const initMap = () => {
         attributionControl: false,
     }).setView(config.latLng, config.zoom);
 
+    new L.basemapsSwitcher(
+        [
+            {
+                layer: L.tileLayer
+                    .canvas("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+                        zoom: config.zoom,
+                        maxZoom: config.maxZoom,
+                        minZoom: config.minZoom,
+                    })
+                    .addTo(map), //DEFAULT MAP
+                icon: "/todo.svg",
+                name: "极简",
+            },
+            {
+                layer: L.tileLayer.canvas(
+                    "http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0",
+                    {
+                        zoom: config.zoom,
+                        maxZoom: config.maxZoom,
+                        minZoom: config.minZoom,
+                    }
+                ),
+                icon: "/todo.svg",
+                name: "导航",
+            },
+            {
+                layer: L.tileLayer.canvas("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+                    zoom: config.zoom,
+                    maxZoom: config.maxZoom,
+                    minZoom: config.minZoom,
+                }),
+                icon: "/todo.svg",
+                name: "暗色",
+            },
+        ],
+        { position: "bottomright" }
+    ).addTo(map);
+
     /*
     https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
     https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}
     https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png
     https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png
     */
-    L.tileLayer
-        .canvas("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-            zoom: config.zoom,
-            maxZoom: config.maxZoom,
-            minZoom: config.minZoom,
-        })
-        .addTo(map);
+    // L.tileLayer
+    //     .canvas("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    //         zoom: config.zoom,
+    //         maxZoom: config.maxZoom,
+    //         minZoom: config.minZoom,
+    //     })
+    //     .addTo(map);
 
     config.map = map;
 };
