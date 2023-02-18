@@ -9,7 +9,7 @@ import { GPSAdaptor } from "./Adaptor.js";
 // import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
-import { colors } from "./Constants.js";
+import { colors, FILE_COUNT } from "./Constants.js";
 import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import "leaflet-sidebar-v2/js/leaflet-sidebar.js";
@@ -23,10 +23,16 @@ const config = reactive({
     maxZoom: 14,
     minZoom: 11,
     duration: 1000,
-    icon: L.icon({
-        iconUrl: "/vehicle.svg",
-        iconSize: [16, 16],
-    }),
+    icon: {
+        UGV: L.icon({
+            iconUrl: "/ugv.svg",
+            iconSize: [16, 16],
+        }),
+        UAV: L.icon({
+            iconUrl: "/uav.svg",
+            iconSize: [16, 16],
+        }),
+    },
     sliderRange: [0, 50],
     opacityOne: 0.6,
     opacityTwo: 0.3,
@@ -66,6 +72,7 @@ const addVehicle = (id, initLatLng) => {
         frame: 0,
         isRunning: true,
         displayTrajectory: false,
+        vehicleType: id < FILE_COUNT / 2 ? "UGV" : "UAV",
     };
     vehicles.move[id] = {
         latLngList: [initLatLng],
@@ -73,7 +80,7 @@ const addVehicle = (id, initLatLng) => {
         timer: null,
         trajetory: null,
         motionOpacity: 1,
-        icon: config.icon,
+        icon: id < FILE_COUNT / 2 ? config.icon.UGV : config.icon.UAV,
     };
     vehicles.smear[id] = {
         displaySmear: true,
@@ -320,13 +327,24 @@ const findVehicleHandler = (id) => {
     if (vehicles.move[id].motion) {
         vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
     }
-    vehicles.move[id].icon = aimIcon;
     setTimeout(() => {
         if (vehicles.move[id].motion) {
-            vehicles.move[id].motion.getMarkers()[0].setIcon(config.icon);
+            vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
         }
-        vehicles.move[id].icon = config.icon;
     }, 2000);
+};
+
+const iconChangeHandler = (id, iconName) => {
+    const iconUrl = `/${iconName.toLowerCase()}.svg`;
+    const icon = L.icon({
+        iconUrl: iconUrl,
+        iconSize: [16, 16],
+    });
+    vehicles.move[id].icon = icon;
+    vehicles.state[id].vehicleType = iconName;
+    if (vehicles.move[id].motion) {
+        vehicles.move[id].motion.getMarkers()[0].setIcon(icon);
+    }
 };
 
 onMounted(() => {
@@ -413,6 +431,7 @@ onMounted(() => {
                                             @toggle="toggleHandler"
                                             @displayTrajectoryChange="displayTrajectoryChangeHandler"
                                             @findVehicle="findVehicleHandler"
+                                            @iconChange="iconChangeHandler"
                                         ></SideBar>
                                     </div>
                                 </div>

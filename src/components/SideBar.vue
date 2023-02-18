@@ -3,10 +3,34 @@ import { ref } from "vue";
 import { FILE_COUNT } from "./Constants.js";
 
 const props = defineProps(["vstates"]);
-const emit = defineEmits(["toggle", "displayTrajectoryChange", "findVehicle"]);
+const emit = defineEmits(["toggle", "displayTrajectoryChange", "findVehicle", "iconChange"]);
 
 const collapseActiveName = ref([""]);
 const switchValue = ref(new Array(FILE_COUNT).fill(false));
+const iconValue = ref(() => {
+    const arr = new Array(FILE_COUNT);
+    for (let i = 0; i < FILE_COUNT; i++) {
+        if (vstates[i].vehicleType == "UGV") {
+            arr[i] = "UGV";
+        } else {
+            arr[i] = "UAV";
+        }
+    }
+    return arr;
+});
+
+const icons = [
+    {
+        value: "UGV",
+        label: "UGV",
+        url: "/ugv.svg",
+    },
+    {
+        value: "UAV",
+        label: "UAV",
+        url: "/uav.svg",
+    },
+];
 
 const toggle = (id) => {
     emit("toggle", id);
@@ -18,6 +42,10 @@ const displayTrajectoryChange = (id) => {
 
 const findVehicle = (id) => {
     emit("findVehicle", id);
+};
+
+const iconChange = (iconName, id) => {
+    emit("iconChange", id, iconName);
 };
 </script>
 
@@ -46,6 +74,18 @@ const findVehicle = (id) => {
                         inactive-text="Hide"
                         @change="displayTrajectoryChange(item.id)"
                     />
+                    <el-select
+                        v-model="iconValue[item.id]"
+                        :placeholder="vstates[item.id].vehicleType"
+                        @change="iconChange($event, item.id)"
+                    >
+                        <el-option :key="icon.value" v-for="icon in icons" :label="icon.label" :value="icon.value">
+                            <span style="float: left">{{ icon.label }}</span>
+                            <span style="float: right; position: absolute; right: 15px; top: 4px">
+                                <img :src="icon.url" />
+                            </span>
+                        </el-option>
+                    </el-select>
                 </el-collapse-item>
             </div>
         </el-collapse>
