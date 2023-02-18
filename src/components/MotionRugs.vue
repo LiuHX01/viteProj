@@ -123,7 +123,13 @@ onMounted(() => {
             <canvas id="canvas"></canvas>
         </el-scrollbar>
         <div class="slider-demo-block">
-            <el-select v-model="strategyValue" class="m-2" placeholder="Select" @change="changeStrategy">
+            <el-select
+                :teleported="false"
+                v-model="strategyValue"
+                class="m-2"
+                placeholder="Select"
+                @change="changeStrategy"
+            >
                 <el-option v-for="item in strategyOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
             &nbsp;&nbsp;

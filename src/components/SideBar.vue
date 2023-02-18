@@ -74,7 +74,9 @@ const iconChange = (iconName, id) => {
                         inactive-text="Hide"
                         @change="displayTrajectoryChange(item.id)"
                     />
+                    <br />
                     <el-select
+                        :teleported="false"
                         v-model="iconValue[item.id]"
                         :placeholder="vstates[item.id].vehicleType"
                         @change="iconChange($event, item.id)"
