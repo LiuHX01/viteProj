@@ -424,7 +424,9 @@ onMounted(() => {
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#todo-2" role="tab">todo2</a>
+                                        <a href="#log" role="tab">
+                                            <img src="/log.svg" />
+                                        </a>
                                     </li>
                                 </ul>
 
@@ -475,9 +477,9 @@ onMounted(() => {
                                     </div>
                                 </div>
 
-                                <div class="leaflet-sidebar-pane" id="todo-2">
+                                <div class="leaflet-sidebar-pane" id="log">
                                     <h1 class="leaflet-sidebar-header">
-                                        todo-2
+                                        some logs
                                         <div class="leaflet-sidebar-close">
                                             <el-icon><DArrowLeft /></el-icon>
                                         </div>

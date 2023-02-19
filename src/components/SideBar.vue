@@ -40,7 +40,8 @@ const displayTrajectoryChange = (id) => {
     emit("displayTrajectoryChange", id);
 };
 
-const findVehicle = (id) => {
+const findVehicle = (e, id) => {
+    e.target.blur();
     emit("findVehicle", id);
 };
 
@@ -78,7 +79,7 @@ const iconChange = (iconName, id) => {
                     <div class="statusItem">
                         <span class="statusContent">Locate:</span>
                         <span class="statusSet">
-                            <el-button type="info" @click="findVehicle(item.id)" round plain>
+                            <el-button type="info" @click="findVehicle($event, item.id)" round plain>
                                 <el-icon size="18" color="#7289AB"><Location /></el-icon>
                             </el-button>
                         </span>
