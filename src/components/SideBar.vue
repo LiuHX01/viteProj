@@ -85,9 +85,12 @@ const iconChange = (iconName, id) => {
                         </span>
                     </div>
                     <div class="statusItem">
-                        <span class="statusContent">Trajectory:</span>
+                        <span class="statusContent">Trajectory is disabled right now :)</span>
                         <span class="statusSet">
-                            <el-switch v-model="switchValue[item.id]" @change="displayTrajectoryChange(item.id)"
+                            <el-switch
+                                disabled
+                                v-model="switchValue[item.id]"
+                                @change="displayTrajectoryChange(item.id)"
                         /></span>
                     </div>
                     <div class="statusItem">
