@@ -542,7 +542,7 @@ onMounted(() => {
     flex-shrink: 0;
 }
 .el-container {
-    height: 90%;
+    height: 87%;
 }
 .el-main {
     padding: 0 0;
