@@ -34,6 +34,7 @@ const config = reactive({
         }),
     },
     sliderRange: [0, 50],
+    sliderRangeY: [1, FILE_COUNT],
     opacityOne: 0.6,
     opacityTwo: 0.3,
 });
@@ -95,7 +96,7 @@ const addVehicle = (id, initLatLng) => {
         id: id,
         frame: 0,
         isRunning: true,
-        displayTrajectory: false,
+        displayTrajectory: true,
         vehicleType: id < FILE_COUNT / 2 ? "UGV" : "UAV",
     };
     vehicles.move[id] = {
@@ -269,27 +270,29 @@ const toggleHandler = (id) => {
     }
 };
 
-const changeRangeHandler = (range) => {
+const changeRangeHandler = (range, highlightValue) => {
     config.sliderRange = range;
-    const start = config.sliderRange[0];
-    const end = config.sliderRange[1];
+    showTrajectoryInRangeFrame(config.sliderRange);
+    setTimeout(() => {
+        removeAllTrajectory();
+    }, 2000);
+};
 
-    // 对于每一个载具
-    for (let i in vehicles.state) {
-        // 清除该载具的轨迹
-        if (vehicles.move[i].trajetory) {
-            vehicles.move[i].trajetory.remove();
-        }
-        if (vehicles.state[i].displayTrajectory) {
-            // 对于该载具的range内每一条轨迹
-            const realEnd = Math.min(end, vehicles.move[i].latLngList.length - 1);
-            const realLatLngList = vehicles.move[i].latLngList.slice(start, realEnd);
-            console.log(`display trajectory of vehicle ${i} in range ${start} to ${realEnd}`);
-
-            vehicles.move[i].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[i].id) });
-            vehicles.move[i].trajetory.addTo(config.map);
+const changeRangeYHandler = (range, highlightValue) => {
+    config.sliderRangeY = range;
+    console.log(`change range y to ${range}, highlight value is ${highlightValue}`);
+    for (let id in vehicles.state) {
+        if (id >= config.sliderRangeY[0] && id <= config.sliderRangeY[1] && highlightValue) {
+            vehicles.state[id].displayTrajectory = true;
+        } else {
+            vehicles.state[id].displayTrajectory = false;
         }
     }
+
+    showTrajectoryInRangeFrame(config.sliderRange);
+    setTimeout(() => {
+        removeAllTrajectory();
+    }, 2000);
 };
 
 const displayTrajectoryChangeHandler = (id) => {
@@ -305,6 +308,22 @@ const displayTrajectoryChangeHandler = (id) => {
 
         vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
         vehicles.move[id].trajetory.addTo(config.map);
+    }
+};
+
+const showTrajectoryInRangeFrame = (range) => {
+    for (let id in vehicles.state) {
+        if (vehicles.move[id].trajetory) {
+            vehicles.move[id].trajetory.remove();
+        }
+        if (vehicles.state[id].displayTrajectory) {
+            const realEnd = Math.min(range[1], vehicles.move[id].latLngList.length - 1);
+            const realLatLngList = vehicles.move[id].latLngList.slice(range[0], realEnd);
+            console.log(`display trajectory of vehicle ${id} in range ${range[0]} to ${realEnd}`);
+
+            vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
+            vehicles.move[id].trajetory.addTo(config.map);
+        }
     }
 };
 
@@ -368,6 +387,25 @@ const iconChangeHandler = (id, iconName) => {
     vehicles.state[id].vehicleType = iconName;
     if (vehicles.move[id].motion) {
         vehicles.move[id].motion.getMarkers()[0].setIcon(icon);
+    }
+};
+
+const removeAllTrajectory = () => {
+    for (let id in vehicles.state) {
+        if (vehicles.move[id].trajetory) {
+            vehicles.move[id].trajetory.remove();
+        }
+    }
+};
+
+const pixelHighlightChangeHandler = (value) => {
+    if (value) {
+        changeRangeYHandler(config.sliderRangeY, value);
+    } else {
+        for (let i in vehicles.state) {
+            vehicles.state[i].displayTrajectory = false;
+        }
+        removeAllTrajectory();
     }
 };
 
@@ -455,7 +493,6 @@ onMounted(() => {
                                         <SideBar
                                             :vstates="vehicles.state"
                                             @toggle="toggleHandler"
-                                            @displayTrajectoryChange="displayTrajectoryChangeHandler"
                                             @findVehicle="findVehicleHandler"
                                             @iconChange="iconChangeHandler"
                                         ></SideBar>
@@ -515,7 +552,12 @@ onMounted(() => {
                 </div>
             </el-main>
             <el-footer>
-                <MotionRugs @changeRange="changeRangeHandler" @fullScreenChange="fullScreenChangeHandler"></MotionRugs>
+                <MotionRugs
+                    @changeRange="changeRangeHandler"
+                    @fullScreenChange="fullScreenChangeHandler"
+                    @changeRangeY="changeRangeYHandler"
+                    @pixelHighlightChange="pixelHighlightChangeHandler"
+                ></MotionRugs>
             </el-footer>
         </el-container>
         <!-- <el-aside width="300px"> -->

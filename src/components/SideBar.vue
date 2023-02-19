@@ -37,7 +37,7 @@ const toggle = (id) => {
 };
 
 const displayTrajectoryChange = (id) => {
-    emit("displayTrajectoryChange", id);
+    // emit("displayTrajectoryChange", id);
 };
 
 const findVehicle = (e, id) => {

@@ -4,12 +4,12 @@ import { MotionAdaptor } from "./Adaptor";
 import { FRAME_LENGTH, FILE_COUNT } from "./Constants.js";
 import { myWorker } from "./MyWorker.js";
 
-const emit = defineEmits(["changeRange", "fullScreenChange"]);
+const emit = defineEmits(["changeRange", "fullScreenChange", "changeRangeY", "pixelHighlightChange"]);
 
 const load = reactive({
     loading: true,
 });
-const value1 = ref([0, 50]);
+const valueX = ref([0, 50]);
 const valueY = ref([1, FILE_COUNT]);
 
 const canvasItem = {
@@ -20,9 +20,11 @@ const canvasItem = {
 
 const pixelHighlightValue = ref(false);
 
+// TODO: 这里
 const pixelHighlightChange = (value) => {
+    emit("pixelHighlightChange", value);
     if (value) {
-        drawMask(value1.value[0], value1.value[1], valueY.value[0], valueY.value[1]);
+        drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
     } else {
         if (canvasItem.ctx) {
             canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
@@ -33,16 +35,16 @@ const pixelHighlightChange = (value) => {
 };
 
 const changeRange = (range) => {
-    emit("changeRange", range);
+    emit("changeRange", range, pixelHighlightValue.value);
     if (pixelHighlightValue.value) {
         drawMask(range[0], range[1], valueY.value[0], valueY.value[1]);
     }
 };
 
 const changeRangeY = (range) => {
-    // emit("changeRangeY", range);
+    emit("changeRangeY", range, pixelHighlightValue.value);
     if (pixelHighlightValue.value) {
-        drawMask(value1.value[0], value1.value[1], range[0], range[1]);
+        drawMask(valueX.value[0], valueX.value[1], range[0], range[1]);
     }
 };
 
@@ -103,7 +105,7 @@ const changeStrategy = (strategyName) => {
             canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
             canvasItem.ctx.putImageData(strategyImgs[strategyName], 0, 0);
             if (pixelHighlightValue.value) {
-                drawMask(value1.value[0], value1.value[1], valueY.value[0], valueY.value[1]);
+                drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
             }
         } else {
             console.log("no such strategy");
@@ -145,7 +147,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div id="motionrug-container">
+    <div id="motionrug-container" v-loading="load.loading">
         <div class="slider-y-container">
             <el-slider
                 class="slider-y"
@@ -159,7 +161,7 @@ onMounted(() => {
                 @change="changeRangeY"
             />
         </div>
-        <el-scrollbar v-loading="load.loading" element-loading-background="rgba(235,235,235,1)">
+        <el-scrollbar element-loading-background="rgba(235,235,235,1)">
             <canvas id="canvas"></canvas>
         </el-scrollbar>
         <div class="slider-demo-block">
@@ -183,7 +185,7 @@ onMounted(() => {
             />
             <el-slider
                 style="padding-left: 10px; padding-right: 10px"
-                v-model="value1"
+                v-model="valueX"
                 range
                 :max="FRAME_LENGTH"
                 @change="changeRange"
