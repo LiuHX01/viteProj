@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { FILE_COUNT } from "./Constants.js";
 
 const props = defineProps(["vstates"]);
-const emit = defineEmits(["toggle", "displayTrajectoryChange", "findVehicle", "iconChange"]);
+const emit = defineEmits(["toggle", "displayTrajectoryChange", "findVehicle", "iconChange", "lockVehicle"]);
 
 const collapseActiveName = ref([""]);
 const switchValue = ref(new Array(FILE_COUNT).fill(false));
@@ -48,6 +48,11 @@ const findVehicle = (e, id) => {
 const iconChange = (iconName, id) => {
     emit("iconChange", id, iconName);
 };
+
+const lockVehicle = (e, id) => {
+    e.target.blur();
+    emit("lockVehicle", id);
+};
 </script>
 
 <template>
@@ -82,6 +87,17 @@ const iconChange = (iconName, id) => {
                             <el-button type="info" @click="findVehicle($event, item.id)" round plain>
                                 <el-icon size="18" color="#7289AB"><Location /></el-icon>
                             </el-button>
+                            <el-button
+                                v-if="!vstates[item.id].locked"
+                                type="info"
+                                @click="lockVehicle($event, item.id)"
+                                round
+                                plain
+                                ><el-icon size="18"><Lock /></el-icon
+                            ></el-button>
+                            <el-button v-else type="info" @click="lockVehicle($event, item.id)" round
+                                ><el-icon size="18"><Unlock /></el-icon
+                            ></el-button>
                         </span>
                     </div>
                     <div class="statusItem">

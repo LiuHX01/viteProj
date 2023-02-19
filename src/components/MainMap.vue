@@ -98,6 +98,7 @@ const addVehicle = (id, initLatLng) => {
         isRunning: true,
         displayTrajectory: false,
         vehicleType: id < FILE_COUNT / 2 ? "UGV" : "UAV",
+        locked: false,
     };
     vehicles.move[id] = {
         latLngList: [initLatLng],
@@ -244,10 +245,15 @@ const addDynamicLine = (id) => {
                     {
                         removeOnEnd: false,
                         showMarker: true,
-                        icon: vehicles.move[id].icon,
+                        icon: vehicles.state[id].locked
+                            ? L.icon({ iconUrl: "/aim.svg", iconSize: [24, 24] })
+                            : vehicles.move[id].icon,
                     }
                 )
                 .addTo(config.map);
+            if (vehicles.state[id].locked) {
+                config.map.setView(currLatLng, config.map.getZoom());
+            }
             vehicles.state[id].frame++;
         }
     }
@@ -377,6 +383,25 @@ const findVehicleHandler = (id) => {
     }, 2000);
 };
 
+const lockVehicleHandler = (id) => {
+    for (let i in vehicles.state) {
+        if (i != id) {
+            vehicles.state[i].locked = false;
+        } else {
+            vehicles.state[i].locked = !vehicles.state[i].locked;
+            if (vehicles.state[i].locked) {
+                const lockIcon = L.icon({
+                    iconUrl: "/aim.svg",
+                    iconSize: [24, 24],
+                });
+                vehicles.move[id].motion.getMarkers()[0].setIcon(lockIcon);
+            } else {
+                vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
+            }
+        }
+    }
+};
+
 const iconChangeHandler = (id, iconName) => {
     const iconUrl = `/${iconName.toLowerCase()}.svg`;
     const icon = L.icon({
@@ -495,6 +520,7 @@ onMounted(() => {
                                             @toggle="toggleHandler"
                                             @findVehicle="findVehicleHandler"
                                             @iconChange="iconChangeHandler"
+                                            @lockVehicle="lockVehicleHandler"
                                         ></SideBar>
                                     </div>
                                 </div>
