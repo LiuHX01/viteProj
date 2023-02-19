@@ -6,7 +6,6 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
-// import "leaflet.chinatmsproviders";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors, FILE_COUNT } from "./Constants.js";
@@ -19,7 +18,6 @@ import "leaflet-switch-basemap/src/L.switchBasemap.css";
 
 const config = reactive({
     map: null,
-    mapSource: "Geoq.Normal.Gray",
     latLng: [39.92641, 116.38876],
     zoom: 12,
     maxZoom: 14,
@@ -87,20 +85,6 @@ const initMap = () => {
         ],
         { position: "bottomright" }
     ).addTo(map);
-
-    /*
-    https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
-    https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}
-    https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png
-    https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png
-    */
-    // L.tileLayer
-    //     .canvas("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    //         zoom: config.zoom,
-    //         maxZoom: config.maxZoom,
-    //         minZoom: config.minZoom,
-    //     })
-    //     .addTo(map);
 
     config.map = map;
 };
@@ -566,12 +550,6 @@ onMounted(() => {
 .el-footer {
     padding: 0 0;
 }
-
-/* #sidebar { */
-/* width: 300px; */
-/* height: 100%; */
-/* } */
-
 .leaflet-sidebar-close {
     top: 2px;
 }
