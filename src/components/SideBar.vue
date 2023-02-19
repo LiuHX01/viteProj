@@ -92,7 +92,7 @@ const iconChange = (iconName, id) => {
                     <div class="statusItem">
                         <span class="statusContent">Icon:</span>
                         <span class="statusSet">
-                            <el-select
+                            <!-- <el-select
                                 size="small"
                                 :teleported="false"
                                 v-model="iconValue[item.id]"
@@ -110,7 +110,15 @@ const iconChange = (iconName, id) => {
                                         <img :src="icon.url" />
                                     </span>
                                 </el-option>
-                            </el-select>
+                            </el-select> -->
+                            <el-radio-group
+                                v-model="vstates[item.id].vehicleType"
+                                @change="iconChange($event, item.id)"
+                            >
+                                <el-radio size="large" v-for="icon in icons" :label="icon.label"
+                                    ><img :src="icon.url" style="height: 20px; width: 20px; font-size: 27px"
+                                /></el-radio>
+                            </el-radio-group>
                         </span>
                     </div>
                 </el-collapse-item>
