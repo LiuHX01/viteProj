@@ -96,7 +96,7 @@ const addVehicle = (id, initLatLng) => {
         id: id,
         frame: 0,
         isRunning: true,
-        displayTrajectory: true,
+        displayTrajectory: false,
         vehicleType: id < FILE_COUNT / 2 ? "UGV" : "UAV",
     };
     vehicles.move[id] = {
