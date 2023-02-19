@@ -387,7 +387,9 @@ const findVehicleHandler = (id) => {
             }
             vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
             setTimeout(() => {
-                vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
+                if (!vehicles.state[id].locked) {
+                    vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
+                }
             }, 2000);
         }
     }
@@ -547,7 +549,7 @@ onMounted(() => {
 
                                 <div class="leaflet-sidebar-pane" id="styleControl">
                                     <h1 class="leaflet-sidebar-header">
-                                        Style Control
+                                        Global Settings
                                         <div class="leaflet-sidebar-close">
                                             <el-icon><DArrowLeft /></el-icon>
                                         </div>
