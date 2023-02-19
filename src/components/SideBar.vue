@@ -61,9 +61,10 @@ const lockVehicle = (e, id) => {
             <div v-for="item in vstates">
                 <el-collapse-item>
                     <template #title>
-                        <el-icon><Van /></el-icon>
-                        &nbsp;&nbsp;|&nbsp;&nbsp; Vehicle: {{ item.id }}
-                    </template>
+                        {{ item.vehicleType }}: {{ item.id }} &nbsp;&nbsp;
+                        <span v-if="item.isRunning" style="color: #67c23a">Running</span>
+                        <span v-else style="color: #f56c6c">Stop</span></template
+                    >
                     <div class="statusItem">
                         <span class="statusContent">Frame:</span>
                         <span class="statusSet" style="float: right; padding-right: 12px; font-size: 17px">{{
@@ -82,26 +83,28 @@ const lockVehicle = (e, id) => {
                         </span>
                     </div>
                     <div class="statusItem">
-                        <span class="statusContent">Locate:</span>
+                        <span class="statusContent">Locate/Lock:</span>
                         <span class="statusSet">
-                            <el-button type="info" @click="findVehicle($event, item.id)" round plain>
-                                <el-icon size="18" color="#7289AB"><Location /></el-icon>
-                            </el-button>
-                            <el-button
-                                v-if="!vstates[item.id].locked"
-                                type="info"
-                                @click="lockVehicle($event, item.id)"
-                                round
-                                plain
-                                ><el-icon size="18"><Lock /></el-icon
-                            ></el-button>
-                            <el-button v-else type="info" @click="lockVehicle($event, item.id)" round
-                                ><el-icon size="18"><Unlock /></el-icon
-                            ></el-button>
+                            <el-button-group>
+                                <el-button type="info" @click="findVehicle($event, item.id)" round plain>
+                                    <el-icon size="18" color="#7289AB"><Location /></el-icon>
+                                </el-button>
+                                <el-button
+                                    v-if="!vstates[item.id].locked"
+                                    type="info"
+                                    @click="lockVehicle($event, item.id)"
+                                    round
+                                    plain
+                                    ><el-icon size="18"><Lock /></el-icon
+                                ></el-button>
+                                <el-button v-else type="info" @click="lockVehicle($event, item.id)" round
+                                    ><el-icon size="18"><Unlock /></el-icon
+                                ></el-button>
+                            </el-button-group>
                         </span>
                     </div>
                     <div class="statusItem">
-                        <span class="statusContent">Trajectory is disabled right now :)</span>
+                        <span class="statusContent">Disabled right now :)</span>
                         <span class="statusSet">
                             <el-switch
                                 disabled

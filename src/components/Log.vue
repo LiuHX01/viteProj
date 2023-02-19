@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import { LogAdaptor } from "./Adaptor";
+</script>
 
 <template></template>
 

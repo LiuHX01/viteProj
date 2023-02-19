@@ -98,6 +98,7 @@ const addVehicle = (id, initLatLng) => {
         isRunning: true,
         displayTrajectory: false,
         vehicleType: id < FILE_COUNT / 2 ? "UGV" : "UAV",
+        vehicleIconURL: id < FILE_COUNT / 2 ? "/ugv.svg" : "/uav.svg",
         locked: false,
     };
     vehicles.move[id] = {
