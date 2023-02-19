@@ -10,7 +10,7 @@ const load = reactive({
     loading: true,
 });
 const value1 = ref([0, 50]);
-const valueY = ref([FILE_COUNT, 1]);
+const valueY = ref([1, FILE_COUNT]);
 
 const canvasItem = {
     canvas: null,
