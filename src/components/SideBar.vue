@@ -58,40 +58,81 @@ const iconChange = (iconName, id) => {
                         <el-icon><Van /></el-icon>
                         &nbsp;&nbsp;|&nbsp;&nbsp; Vehicle: {{ item.id }}
                     </template>
-                    <div>Frame: {{ item.frame }}</div>
-                    <el-button v-if="item.isRunning" type="primary" @click="toggle(item.id)">
-                        <el-icon><VideoPause /></el-icon>
-                    </el-button>
-                    <el-button v-else type="warning" @click="toggle(item.id)">
-                        <el-icon><VideoPlay /></el-icon>
-                    </el-button>
-                    <br />
-                    <el-button type="info" @click="findVehicle(item.id)">Lock</el-button>
-                    <br />
-                    <el-switch
-                        v-model="switchValue[item.id]"
-                        active-text="Show"
-                        inactive-text="Hide"
-                        @change="displayTrajectoryChange(item.id)"
-                    />
-                    <br />
-                    <el-select
-                        :teleported="false"
-                        v-model="iconValue[item.id]"
-                        :placeholder="vstates[item.id].vehicleType"
-                        @change="iconChange($event, item.id)"
-                    >
-                        <el-option :key="icon.value" v-for="icon in icons" :label="icon.label" :value="icon.value">
-                            <span style="float: left">{{ icon.label }}</span>
-                            <span style="float: right; position: absolute; right: 15px; top: 4px">
-                                <img :src="icon.url" />
-                            </span>
-                        </el-option>
-                    </el-select>
+                    <div class="statusItem">
+                        <span class="statusContent">Frame:</span>
+                        <span class="statusSet" style="float: right; padding-right: 12px; font-size: 17px">{{
+                            item.frame
+                        }}</span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Pause/Resume:</span>
+                        <span class="statusSet">
+                            <el-button v-if="item.isRunning" type="primary" @click="toggle(item.id)" round plain>
+                                <el-icon size="18"><VideoPause /></el-icon>
+                            </el-button>
+                            <el-button v-else type="warning" @click="toggle(item.id)" round plain>
+                                <el-icon size="18"><VideoPlay /></el-icon>
+                            </el-button>
+                        </span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Locate:</span>
+                        <span class="statusSet">
+                            <el-button type="info" @click="findVehicle(item.id)" round plain>
+                                <el-icon size="18" color="#7289AB"><Location /></el-icon>
+                            </el-button>
+                        </span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Trajectory:</span>
+                        <span class="statusSet">
+                            <el-switch v-model="switchValue[item.id]" @change="displayTrajectoryChange(item.id)"
+                        /></span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Icon:</span>
+                        <span class="statusSet">
+                            <el-select
+                                size="small"
+                                :teleported="false"
+                                v-model="iconValue[item.id]"
+                                :placeholder="vstates[item.id].vehicleType"
+                                @change="iconChange($event, item.id)"
+                            >
+                                <el-option
+                                    :key="icon.value"
+                                    v-for="icon in icons"
+                                    :label="icon.label"
+                                    :value="icon.value"
+                                >
+                                    <span>{{ icon.label }}</span>
+                                    <span>
+                                        <img :src="icon.url" />
+                                    </span>
+                                </el-option>
+                            </el-select>
+                        </span>
+                    </div>
                 </el-collapse-item>
             </div>
         </el-collapse>
     </el-scrollbar>
 </template>
 
-<style scoped></style>
+<style scoped>
+.statusItem {
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #ebeef5;
+}
+.statusSet {
+    float: right;
+    height: 40px;
+    line-height: 40px;
+    /* padding-right: 12px; */
+}
+.statusContent {
+    font-weight: bold;
+    font-size: 14px;
+}
+</style>
