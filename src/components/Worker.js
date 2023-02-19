@@ -46,8 +46,21 @@ onmessage = (msg) => {
                 }
             }
 
+            // image data upside down in canvas
+            let flipped = new ImageData(ordered.length, ordered[0].length);
+            for (let i = 0; i < ordered.length; i++) {
+                for (let j = 0; j < ordered[i].length; j++) {
+                    const idx = 4 * (i + j * ordered.length);
+                    const flippedIdx = 4 * (i + (ordered[i].length - j - 1) * ordered.length);
+                    flipped.data[flippedIdx] = img.data[idx];
+                    flipped.data[flippedIdx + 1] = img.data[idx + 1];
+                    flipped.data[flippedIdx + 2] = img.data[idx + 2];
+                    flipped.data[flippedIdx + 3] = img.data[idx + 3];
+                }
+            }
+
             postMessage({
-                data: { img: img, width: ordered.length, height: ordered[0].length },
+                data: { img: flipped, width: ordered.length, height: ordered[0].length },
                 type: "setPixel",
                 info: strategyName,
             });

@@ -47,6 +47,7 @@ const changeRangeY = (range) => {
 };
 
 const drawMask = (start, end, startY, endY) => {
+    console.log(`draw mask: ${start}, ${end}, ${startY}, ${endY}`);
     if (canvasItem.ctx) {
         if (canvasItem.highlight) {
             canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
@@ -70,18 +71,22 @@ const drawMask = (start, end, startY, endY) => {
         const topX = start;
         const topY = 0;
         const topWidth = end - start;
-        const topHeight = startY;
+        const topHeight = canvasItem.canvas.height - endY;
         canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         canvasItem.ctx.fillRect(topX, topY, topWidth, topHeight);
 
         const bottomX = start;
-        const bottomY = endY;
+        const bottomY = canvasItem.canvas.height - startY;
         const bottomWidth = end - start;
-        const bottomHeight = canvasItem.canvas.height - endY;
+        const bottomHeight = startY;
         canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         canvasItem.ctx.fillRect(bottomX, bottomY, bottomWidth, bottomHeight);
 
         canvasItem.highlight = true;
+
+        /**
+         * startY:30 - endY:70
+         */
     }
 };
 
