@@ -107,6 +107,7 @@ const addVehicle = (id, initLatLng) => {
         trajetory: null,
         motionOpacity: 1,
         icon: id < FILE_COUNT / 2 ? config.icon.UGV : config.icon.UAV,
+        lockTimer: null,
     };
     vehicles.smear[id] = {
         displaySmear: true,
@@ -251,9 +252,9 @@ const addDynamicLine = (id) => {
                     }
                 )
                 .addTo(config.map);
-            if (vehicles.state[id].locked) {
-                config.map.setView(currLatLng, config.map.getZoom());
-            }
+            // if (vehicles.state[id].locked) {
+            //     config.map.setView(currLatLng, config.map.getZoom());
+            // }
             vehicles.state[id].frame++;
         }
     }
@@ -373,23 +374,41 @@ const findVehicleHandler = (id) => {
         iconUrl: "/aim.svg",
         iconSize: [24, 24],
     });
+
     if (vehicles.move[id].motion) {
-        vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
-    }
-    setTimeout(() => {
-        if (vehicles.move[id].motion) {
-            vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
+        // if 这个车不在lock，清除其他车的lock，处理这个车
+        if (!vehicles.state[id].locked) {
+            for (let i in vehicles.state) {
+                vehicles.state[i].locked = false;
+                if (vehicles.move[i].lockTimer) {
+                    clearInterval(vehicles.move[i].lockTimer);
+                }
+                vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
+            }
+            vehicles.move[id].motion.getMarkers()[0].setIcon(aimIcon);
+            setTimeout(() => {
+                vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
+            }, 2000);
         }
-    }, 2000);
+    }
 };
 
 const lockVehicleHandler = (id) => {
     for (let i in vehicles.state) {
         if (i != id) {
             vehicles.state[i].locked = false;
+            if (vehicles.move[i].lockTimer) {
+                clearInterval(vehicles.move[i].lockTimer);
+            }
         } else {
             vehicles.state[i].locked = !vehicles.state[i].locked;
             if (vehicles.state[i].locked) {
+                vehicles.move[i].lockTimer = setInterval(() => {
+                    if (vehicles.move[i].motion) {
+                        const latLng = vehicles.move[i].motion.getMarkers()[0].getLatLng();
+                        config.map.setView(latLng, config.map.getZoom());
+                    }
+                }, 100);
                 const lockIcon = L.icon({
                     iconUrl: "/aim.svg",
                     iconSize: [24, 24],
@@ -397,6 +416,7 @@ const lockVehicleHandler = (id) => {
                 vehicles.move[id].motion.getMarkers()[0].setIcon(lockIcon);
             } else {
                 vehicles.move[id].motion.getMarkers()[0].setIcon(vehicles.move[id].icon);
+                clearInterval(vehicles.move[i].lockTimer);
             }
         }
     }
@@ -410,7 +430,7 @@ const iconChangeHandler = (id, iconName) => {
     });
     vehicles.move[id].icon = icon;
     vehicles.state[id].vehicleType = iconName;
-    if (vehicles.move[id].motion) {
+    if (vehicles.move[id].motion && !vehicles.state[id].locked) {
         vehicles.move[id].motion.getMarkers()[0].setIcon(icon);
     }
 };
