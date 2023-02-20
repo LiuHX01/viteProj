@@ -7,7 +7,6 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { onMounted, reactive } from "vue";
 import { GPSAdaptor, LogAdaptor } from "./Adaptor.js";
-import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors, FILE_COUNT } from "./Constants.js";
 import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
@@ -19,6 +18,7 @@ import "leaflet-switch-basemap/src/L.switchBasemap.css";
 
 const config = reactive({
     map: null,
+    sourceName: "baseMaps",
     latLng: [39.92641, 116.38876],
     zoom: 12,
     maxZoom: 14,
@@ -36,53 +36,60 @@ const config = reactive({
     },
     sliderRange: [0, 50],
     sliderRangeY: [1, FILE_COUNT],
-    opacityOne: 0.6,
-    opacityTwo: 0.3,
 });
+
+const tileLayerSources = {
+    stadiaMaps: {
+        light: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        dark: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+        voyager: "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",
+    },
+    baseMaps: {
+        light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        voyager: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    },
+};
 
 const vehicles = reactive({ state: {}, move: {}, smear: {} });
 
 // 初始化地图
-const initMap = () => {
+const initMap = (sourceName) => {
     const map = L.map("map", {
         preferCanvas: true,
         renderer: L.canvas(),
         attributionControl: false,
     }).setView(config.latLng, config.zoom);
 
+    const { light, dark, voyager } = tileLayerSources[sourceName];
     new L.basemapsSwitcher(
         [
             {
-                layer: L.tileLayer
-                    .canvas("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-                        zoom: config.zoom,
-                        maxZoom: config.maxZoom,
-                        minZoom: config.minZoom,
-                    })
-                    .addTo(map), //DEFAULT MAP
-                icon: "/todo.svg",
-                name: "极简",
+                layer: L.tileLayer(light, {
+                    zoom: config.zoom,
+                    maxZoom: config.maxZoom,
+                    minZoom: config.minZoom,
+                }).addTo(map),
+                icon: "/light.png",
+                name: "Light",
             },
             {
-                layer: L.tileLayer.canvas(
-                    "http://rt0.map.gtimg.com/realtimerender?z={z}&x={x}&y={-y}&type=vector&style=0",
-                    {
-                        zoom: config.zoom,
-                        maxZoom: config.maxZoom,
-                        minZoom: config.minZoom,
-                    }
-                ),
-                icon: "/todo.svg",
-                name: "导航",
-            },
-            {
-                layer: L.tileLayer.canvas("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+                layer: L.tileLayer(dark, {
                     zoom: config.zoom,
                     maxZoom: config.maxZoom,
                     minZoom: config.minZoom,
                 }),
-                icon: "/todo.svg",
-                name: "暗色",
+                icon: "/dark.png",
+                name: "Dark",
+            },
+            {
+                layer: L.tileLayer(voyager, {
+                    zoom: config.zoom,
+                    maxZoom: config.maxZoom,
+                    minZoom: config.minZoom,
+                }),
+                icon: "/voyager.png",
+                name: "Voyager",
             },
         ],
         { position: "bottomright" }
@@ -485,7 +492,7 @@ const sendLog = (id, eventStr) => {
 };
 
 onMounted(() => {
-    initMap();
+    initMap(config.sourceName);
     config.map.zoomControl.setPosition("topright");
     L.control.sidebar({ container: "sidebar" }).addTo(config.map);
     L.control
