@@ -36,6 +36,10 @@ const config = reactive({
     },
     sliderRange: [0, 50],
     sliderRangeY: [1, FILE_COUNT],
+
+    trackedVehicle: null,
+    trackedLines: [],
+    trackMarkers: [],
 });
 
 const curr = reactive({
@@ -58,7 +62,7 @@ const tileLayerSources = {
     },
 };
 
-const vehicles = reactive({ state: {}, move: {}, smear: {} });
+const vehicles = reactive({ state: {}, move: {}, smear: {}, settedTracks: {} });
 
 // 初始化地图
 const initMap = (sourceName) => {
@@ -107,6 +111,14 @@ const initMap = (sourceName) => {
     config.map.on("drag", () => {
         curr.view = config.map.getCenter();
     });
+
+    config.map.on("click", (e) => {
+        if (config.trackedVehicle) {
+            config.trackedLines.push(e.latlng);
+            config.trackMarkers.push(L.marker(e.latlng, {}).addTo(config.map));
+        }
+    });
+
     sendLog(null, "Map initialized.");
 };
 
@@ -121,6 +133,7 @@ const addVehicle = (id, initLatLng) => {
         vehicleIconURL: id < FILE_COUNT / 2 ? "/ugv.svg" : "/uav.svg",
         locked: false,
         currLatLng: [-1, -1],
+        setPathing: false,
     };
     vehicles.move[id] = {
         latLngList: [initLatLng],
@@ -539,6 +552,40 @@ const resetViewHandler = () => {
     config.map.setView(curr.view, config.map.getZoom());
 };
 
+const setPathStartHandler = (id) => {
+    if (!config.trackedVehicle) {
+        config.trackedVehicle = id;
+        vehicles.state[id].setPathing = true;
+    }
+};
+
+const setPathEndHandler = (id) => {
+    if (config.trackedVehicle == id) {
+        config.trackMarkers.forEach((marker) => {
+            marker.remove();
+        });
+        config.trackMarkers = [];
+
+        vehicles.move[id].latLngList.splice(vehicles.state[id].frame, 0, ...config.trackedLines);
+        config.trackedLines = [];
+        config.trackedVehicle = null;
+        vehicles.state[id].setPathing = false;
+    }
+};
+
+const deletePathHandler = (id) => {
+    console.log(`delete path ${id}`);
+    config.trackMarkers.forEach((marker) => {
+        marker.remove();
+    });
+    config.trackMarkers = [];
+    config.trackedLines = [];
+    config.trackedVehicle = null;
+    for (let i in vehicles.state) {
+        vehicles.state[i].setPathing = false;
+    }
+};
+
 onMounted(() => {
     initMap(config.sourceName);
     config.map.zoomControl.setPosition("topright");
@@ -631,6 +678,9 @@ onMounted(() => {
                                             @findVehicle="findVehicleHandler"
                                             @iconChange="iconChangeHandler"
                                             @lockVehicle="lockVehicleHandler"
+                                            @setPathStart="setPathStartHandler"
+                                            @setPathEnd="setPathEndHandler"
+                                            @deletePath="deletePathHandler"
                                         ></SideBar>
                                     </div>
                                 </div>

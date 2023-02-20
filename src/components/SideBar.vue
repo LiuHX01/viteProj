@@ -3,21 +3,19 @@ import { ref } from "vue";
 import { FILE_COUNT } from "./Constants.js";
 
 const props = defineProps(["vstates"]);
-const emit = defineEmits(["toggle", "displayTrajectoryChange", "findVehicle", "iconChange", "lockVehicle"]);
+const emit = defineEmits([
+    "toggle",
+    "displayTrajectoryChange",
+    "findVehicle",
+    "iconChange",
+    "lockVehicle",
+    "setPathStart",
+    "setPathEnd",
+    "deletePath",
+]);
 
 const collapseActiveName = ref([""]);
 const switchValue = ref(new Array(FILE_COUNT).fill(false));
-const iconValue = ref(() => {
-    const arr = new Array(FILE_COUNT);
-    for (let i = 0; i < FILE_COUNT; i++) {
-        if (vstates[i].vehicleType == "UGV") {
-            arr[i] = "UGV";
-        } else {
-            arr[i] = "UAV";
-        }
-    }
-    return arr;
-});
 
 const icons = [
     {
@@ -53,6 +51,21 @@ const lockVehicle = (e, id) => {
     e.target.blur();
     emit("lockVehicle", id);
 };
+
+const setPathStart = (e, id) => {
+    e.target.blur();
+    emit("setPathStart", id);
+};
+
+const setPathEnd = (e, id) => {
+    e.target.blur();
+    emit("setPathEnd", id);
+};
+
+const deletePath = (e, id) => {
+    e.target.blur();
+    emit("deletePath", id);
+};
 </script>
 
 <template>
@@ -64,8 +77,8 @@ const lockVehicle = (e, id) => {
                         {{ item.vehicleType }}: {{ item.id }} &nbsp;&nbsp;
                         <span v-if="item.isRunning" style="color: #67c23a">Running</span>
                         <span v-else style="color: #f56c6c">Stop</span>
-                        &nbsp;&nbsp;
-                        <span v-if="item.locked" style="color: #409eff">Locked</span>
+                        <span v-if="item.locked" style="color: #409eff">&nbsp;&nbsp;Locked</span>
+                        <span v-if="item.setPathing" style="color: #e6a23c">&nbsp;&nbsp;Seting Path</span>
                     </template>
                     <div class="statusItem">
                         <span class="statusContent">Frame:</span>
@@ -129,25 +142,6 @@ const lockVehicle = (e, id) => {
                     <div class="statusItem">
                         <span class="statusContent">Icon:</span>
                         <span class="statusSet">
-                            <!-- <el-select
-                                size="small"
-                                :teleported="false"
-                                v-model="iconValue[item.id]"
-                                :placeholder="vstates[item.id].vehicleType"
-                                @change="iconChange($event, item.id)"
-                            >
-                                <el-option
-                                    :key="icon.value"
-                                    v-for="icon in icons"
-                                    :label="icon.label"
-                                    :value="icon.value"
-                                >
-                                    <span>{{ icon.label }}</span>
-                                    <span>
-                                        <img :src="icon.url" />
-                                    </span>
-                                </el-option>
-                            </el-select> -->
                             <el-radio-group
                                 v-model="vstates[item.id].vehicleType"
                                 @change="iconChange($event, item.id)"
@@ -156,6 +150,29 @@ const lockVehicle = (e, id) => {
                                     ><img :src="icon.url" style="height: 20px; width: 20px; font-size: 27px"
                                 /></el-radio>
                             </el-radio-group>
+                        </span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Set Path</span>
+                        <span class="statusSet">
+                            <el-button-group>
+                                <el-button
+                                    v-if="!vstates[item.id].setPathing"
+                                    type="info"
+                                    @click="setPathStart($event, item.id)"
+                                    round
+                                    plain
+                                    ><el-icon size="18"><Plus /></el-icon
+                                ></el-button>
+                                <el-button v-else type="info" @click="setPathEnd($event, item.id)" round
+                                    ><el-icon size="18"><Check /></el-icon
+                                ></el-button>
+                                <el-button type="warning" round plain>
+                                    <el-icon size="18" @click="deletePath($event, item.id)" color="#7289AB"
+                                        ><Delete
+                                    /></el-icon>
+                                </el-button>
+                            </el-button-group>
                         </span>
                     </div>
                 </el-collapse-item>
