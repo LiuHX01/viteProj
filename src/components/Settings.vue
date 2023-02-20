@@ -81,7 +81,7 @@ const resetView = (e) => {
                         :precision="6"
                         :min="0"
                         :max="90"
-                        :step="0.00005"
+                        :step="0.001"
                         size="small"
                         @change="latChange"
                     />
@@ -95,7 +95,7 @@ const resetView = (e) => {
                         :precision="6"
                         :min="0"
                         :max="180"
-                        :step="0.00005"
+                        :step="0.001"
                         size="small"
                         @change="lngChange"
                     />

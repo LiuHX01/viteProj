@@ -39,7 +39,10 @@ const config = reactive({
 });
 
 const curr = reactive({
-    view: config.latLng,
+    view: {
+        lat: 39.92641,
+        lng: 116.38876,
+    },
 });
 
 const tileLayerSources = {
@@ -532,7 +535,7 @@ const resetViewHandler = () => {
         }
         vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
     }
-    curr.view = config.latLng;
+    curr.view = { lat: 39.92641, lng: 116.38876 };
     config.map.setView(curr.view, config.map.getZoom());
 };
 
