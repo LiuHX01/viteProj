@@ -63,12 +63,26 @@ const lockVehicle = (e, id) => {
                     <template #title>
                         {{ item.vehicleType }}: {{ item.id }} &nbsp;&nbsp;
                         <span v-if="item.isRunning" style="color: #67c23a">Running</span>
-                        <span v-else style="color: #f56c6c">Stop</span></template
-                    >
+                        <span v-else style="color: #f56c6c">Stop</span>
+                        &nbsp;&nbsp;
+                        <span v-if="item.locked" style="color: #409eff">Locked</span>
+                    </template>
                     <div class="statusItem">
                         <span class="statusContent">Frame:</span>
                         <span class="statusSet" style="float: right; padding-right: 12px; font-size: 17px">{{
                             item.frame
+                        }}</span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Latitude:</span>
+                        <span class="statusSet" style="float: right; padding-right: 12px; font-size: 17px">{{
+                            parseFloat(item.currLatLng.lat).toFixed(6)
+                        }}</span>
+                    </div>
+                    <div class="statusItem">
+                        <span class="statusContent">Longitude:</span>
+                        <span class="statusSet" style="float: right; padding-right: 12px; font-size: 17px">{{
+                            parseFloat(item.currLatLng.lng).toFixed(6)
                         }}</span>
                     </div>
                     <div class="statusItem">

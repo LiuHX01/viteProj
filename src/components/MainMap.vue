@@ -103,6 +103,7 @@ const addVehicle = (id, initLatLng) => {
         vehicleType: id < FILE_COUNT / 2 ? "UGV" : "UAV",
         vehicleIconURL: id < FILE_COUNT / 2 ? "/ugv.svg" : "/uav.svg",
         locked: false,
+        currLatLng: [-1, -1],
     };
     vehicles.move[id] = {
         latLngList: [initLatLng],
@@ -111,7 +112,7 @@ const addVehicle = (id, initLatLng) => {
         trajetory: null,
         motionOpacity: 1,
         icon: id < FILE_COUNT / 2 ? config.icon.UGV : config.icon.UAV,
-        lockTimer: null,
+        lockTimer: { lat: -1, lng: -1 },
     };
     vehicles.smear[id] = {
         displaySmear: true,
@@ -504,6 +505,11 @@ onMounted(() => {
                 } else {
                     if (vehicles.move[id].latLngList.length === 2) {
                         vehicles.move[id].timer = setInterval(addDynamicLine, config.duration, id);
+                        setInterval(() => {
+                            if (vehicles.move[id].motion) {
+                                vehicles.state[id].currLatLng = vehicles.move[id].motion.getMarkers()[0].getLatLng();
+                            }
+                        }, 200);
                     }
                     vehicles.move[id].latLngList.push(L.latLng(lat, lng));
                 }
