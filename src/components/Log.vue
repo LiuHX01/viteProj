@@ -28,8 +28,8 @@ LogAdaptor.DataListener((data) => {
 <template>
     <el-auto-resizer>
         <el-table :data="colomns" border :resizable="false">
-            <el-table-column prop="date" label="Date" width="91" align="center"></el-table-column>
-            <el-table-column prop="time" label="Time" width="72" align="center"></el-table-column>
+            <el-table-column prop="date" label="Date" width="95" align="center"></el-table-column>
+            <el-table-column prop="time" label="Time" width="95" align="center"></el-table-column>
             <!-- <el-table-column prop="id" label="Id" width="50" align="center"></el-table-column> -->
             <el-table-column prop="event" label="Event" align="center"></el-table-column>
         </el-table>

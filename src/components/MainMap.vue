@@ -5,7 +5,7 @@ import Settings from "./Settings.vue";
 import Log from "./Log.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { GPSAdaptor, LogAdaptor } from "./Adaptor.js";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors, FILE_COUNT } from "./Constants.js";
@@ -19,7 +19,7 @@ import "leaflet-switch-basemap/src/L.switchBasemap.css";
 const config = reactive({
     map: null,
     sourceName: "baseMaps",
-    latLng: [39.92641, 116.38876],
+    latLng: { lat: 39.92641, lng: 116.38876 },
     zoom: 12,
     maxZoom: 14,
     minZoom: 11,
@@ -36,6 +36,10 @@ const config = reactive({
     },
     sliderRange: [0, 50],
     sliderRangeY: [1, FILE_COUNT],
+});
+
+const curr = reactive({
+    view: config.latLng,
 });
 
 const tileLayerSources = {
@@ -388,6 +392,7 @@ const fullScreenChangeHandler = (value) => {
 
 const findVehicleHandler = (id) => {
     const latLng = vehicles.move[id].latLngList[vehicles.state[id].frame];
+    curr.view = latLng;
     config.map.setView(latLng, config.map.getZoom());
 
     const aimIcon = L.icon({
@@ -430,6 +435,7 @@ const lockVehicleHandler = (id) => {
                 vehicles.move[i].lockTimer = setInterval(() => {
                     if (vehicles.move[i].motion) {
                         const latLng = vehicles.move[i].motion.getMarkers()[0].getLatLng();
+                        curr.view = latLng;
                         config.map.setView(latLng, config.map.getZoom());
                     }
                 }, 100);
@@ -596,6 +602,7 @@ onMounted(() => {
                                     </h1>
                                     <div style="margin-top: 10px">
                                         <Settings
+                                            :latlng="curr.view"
                                             @displaySmearChange="displaySmearChangeHandler"
                                             @displaySmearLengthChange="displaySmearLengthChangeHandler"
                                         ></Settings>

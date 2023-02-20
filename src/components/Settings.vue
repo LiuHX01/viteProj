@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
-const emit = defineEmits(["displaySmearChange"]);
+const props = defineProps(["latlng"]);
+const emit = defineEmits(["displaySmearChange", "displaySmearLengthChange"]);
 
 const displaySmearValue = ref(true);
 const displaySmearChange = (isDisplay) => {
@@ -40,6 +41,42 @@ const displaySmearLengthChange = (length) => {
                         size="small"
                         :disabled="disableDisplaySmearLengthChange"
                         @change="displaySmearLengthChange"
+                    />
+                </span>
+            </div>
+        </div>
+    </el-card>
+    <br />
+    <el-card shadow="hover" class="box-card">
+        <template #header>
+            <div class="card-header">
+                <span style="font-size: large">Viewer</span>
+            </div>
+        </template>
+        <div class="card-content">
+            <div class="card-item">
+                <span class="setting-content">Latitude</span>
+                <span class="setting-control">
+                    <el-input-number
+                        v-model="props.latlng.lat"
+                        :precision="6"
+                        :min="0"
+                        :max="90"
+                        :step="0.00005"
+                        size="small"
+                    />
+                </span>
+            </div>
+            <div class="card-item">
+                <span class="setting-content">Longitude</span>
+                <span class="setting-control">
+                    <el-input-number
+                        v-model="props.latlng.lng"
+                        :precision="6"
+                        :min="0"
+                        :max="180"
+                        :step="0.00005"
+                        size="small"
                     />
                 </span>
             </div>
