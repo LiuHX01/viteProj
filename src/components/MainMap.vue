@@ -101,6 +101,9 @@ const initMap = (sourceName) => {
 
     config.map = map;
 
+    config.map.on("drag", () => {
+        curr.view = config.map.getCenter();
+    });
     sendLog(null, "Map initialized.");
 };
 
@@ -497,6 +500,42 @@ const sendLog = (id, eventStr) => {
     });
 };
 
+const latChangeHandler = (newLat) => {
+    for (let i in vehicles.state) {
+        vehicles.state[i].locked = false;
+        if (vehicles.move[i].lockTimer) {
+            clearInterval(vehicles.move[i].lockTimer);
+        }
+        vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
+    }
+    curr.view.lat = newLat;
+    config.map.setView(curr.view, config.map.getZoom());
+};
+
+const lngChangeHandler = (newLng) => {
+    for (let i in vehicles.state) {
+        vehicles.state[i].locked = false;
+        if (vehicles.move[i].lockTimer) {
+            clearInterval(vehicles.move[i].lockTimer);
+        }
+        vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
+    }
+    curr.view.lng = newLng;
+    config.map.setView(curr.view, config.map.getZoom());
+};
+
+const resetViewHandler = () => {
+    for (let i in vehicles.state) {
+        vehicles.state[i].locked = false;
+        if (vehicles.move[i].lockTimer) {
+            clearInterval(vehicles.move[i].lockTimer);
+        }
+        vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
+    }
+    curr.view = config.latLng;
+    config.map.setView(curr.view, config.map.getZoom());
+};
+
 onMounted(() => {
     initMap(config.sourceName);
     config.map.zoomControl.setPosition("topright");
@@ -605,6 +644,9 @@ onMounted(() => {
                                             :latlng="curr.view"
                                             @displaySmearChange="displaySmearChangeHandler"
                                             @displaySmearLengthChange="displaySmearLengthChangeHandler"
+                                            @latChange="latChangeHandler"
+                                            @lngChange="lngChangeHandler"
+                                            @resetView="resetViewHandler"
                                         ></Settings>
                                     </div>
                                 </div>

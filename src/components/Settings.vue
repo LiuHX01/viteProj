@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 
 const props = defineProps(["latlng"]);
-const emit = defineEmits(["displaySmearChange", "displaySmearLengthChange"]);
+const emit = defineEmits(["displaySmearChange", "displaySmearLengthChange", "latChange", "lngChange", "resetView"]);
 
 const displaySmearValue = ref(true);
 const displaySmearChange = (isDisplay) => {
@@ -14,6 +14,18 @@ const displaySmearLengthValue = ref(2);
 const disableDisplaySmearLengthChange = ref(false);
 const displaySmearLengthChange = (length) => {
     emit("displaySmearLengthChange", length);
+};
+
+const latChange = (newLat) => {
+    emit("latChange", newLat);
+};
+
+const lngChange = (newLng) => {
+    emit("lngChange", newLng);
+};
+
+const resetView = () => {
+    emit("resetView");
 };
 </script>
 
@@ -55,6 +67,12 @@ const displaySmearLengthChange = (length) => {
         </template>
         <div class="card-content">
             <div class="card-item">
+                <span class="setting-content">View Reset</span>
+                <span class="setting-control">
+                    <el-button type="primary" size="small" round plain @click="resetView">Reset</el-button>
+                </span>
+            </div>
+            <div class="card-item">
                 <span class="setting-content">Latitude</span>
                 <span class="setting-control">
                     <el-input-number
@@ -64,6 +82,7 @@ const displaySmearLengthChange = (length) => {
                         :max="90"
                         :step="0.00005"
                         size="small"
+                        @change="latChange"
                     />
                 </span>
             </div>
@@ -77,6 +96,7 @@ const displaySmearLengthChange = (length) => {
                         :max="180"
                         :step="0.00005"
                         size="small"
+                        @change="lngChange"
                     />
                 </span>
             </div>
