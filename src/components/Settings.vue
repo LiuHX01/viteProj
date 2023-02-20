@@ -24,7 +24,8 @@ const lngChange = (newLng) => {
     emit("lngChange", newLng);
 };
 
-const resetView = () => {
+const resetView = (e) => {
+    e.target.blur();
     emit("resetView");
 };
 </script>
@@ -69,7 +70,7 @@ const resetView = () => {
             <div class="card-item">
                 <span class="setting-content">View Reset</span>
                 <span class="setting-control">
-                    <el-button type="primary" size="small" round plain @click="resetView">Reset</el-button>
+                    <el-button type="primary" size="small" round plain @click="resetView($event)">Reset</el-button>
                 </span>
             </div>
             <div class="card-item">
