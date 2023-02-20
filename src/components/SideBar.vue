@@ -78,7 +78,7 @@ const deletePath = (e, id) => {
                         <span v-if="item.isRunning" style="color: #67c23a">Running</span>
                         <span v-else style="color: #f56c6c">Stop</span>
                         <span v-if="item.locked" style="color: #409eff">&nbsp;&nbsp;Locked</span>
-                        <span v-if="item.setPathing" style="color: #e6a23c">&nbsp;&nbsp;Seting Path</span>
+                        <span v-if="item.setPathing" style="color: #e6a23c">&nbsp;&nbsp;Setting Path</span>
                     </template>
                     <div class="statusItem">
                         <span class="statusContent">Frame:</span>

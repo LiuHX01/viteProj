@@ -115,7 +115,7 @@ const initMap = (sourceName) => {
     config.map.on("click", (e) => {
         if (config.trackedVehicle) {
             config.trackedLines.push(e.latlng);
-            config.trackMarkers.push(L.marker(e.latlng, {}).addTo(config.map));
+            config.trackMarkers.push(L.marker(e.latlng).addTo(config.map));
         }
     });
 
