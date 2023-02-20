@@ -1,7 +1,7 @@
 <script setup>
 import MainMap from "./components/MainMap.vue";
 import { onMounted, watch, ref } from "vue";
-import { GPSAdaptor, MotionAdaptor } from "./components/Adaptor.js";
+import { GPSAdaptor, LogAdaptor, MotionAdaptor } from "./components/Adaptor.js";
 import csv from "csvtojson";
 import { myWorker } from "./components/MyWorker.js";
 import { FILE_COUNT } from "./components/Constants.js";
@@ -38,6 +38,11 @@ onMounted(() => {
                         dataGroupByTime[i].push(jsonObj[i]);
                     }
                     finished.value++;
+
+                    LogAdaptor.DataEmitter({
+                        id: info,
+                        event: `Vehicle ${info} loaded.`,
+                    });
                 });
         }
     });

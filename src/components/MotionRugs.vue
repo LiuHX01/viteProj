@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import { MotionAdaptor } from "./Adaptor";
+import { MotionAdaptor, LogAdaptor } from "./Adaptor";
 import { FRAME_LENGTH, FILE_COUNT } from "./Constants.js";
 import { myWorker } from "./MyWorker.js";
 
@@ -89,6 +89,7 @@ const drawMask = (start, end, startY, endY) => {
         /**
          * startY:30 - endY:70
          */
+        sendLog("motionrug", `draw mask: ${start}, ${end}, ${startY}, ${endY}`);
     }
 };
 
@@ -99,7 +100,6 @@ const strategyOptions = reactive([]);
 const strategyImgs = {};
 
 const changeStrategy = (strategyName) => {
-    console.log(`change strategy to ${strategyName}`);
     if (canvasItem.ctx) {
         if (strategyImgs[strategyName]) {
             canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
@@ -107,8 +107,10 @@ const changeStrategy = (strategyName) => {
             if (pixelHighlightValue.value) {
                 drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
             }
+            sendLog("motionrug", `change strategy to ${strategyName}`);
         } else {
             console.log("no such strategy");
+            sendLog("motionrug", `no such strategy ${strategyName}`);
         }
     }
 };
@@ -117,6 +119,13 @@ const fullScreenValue = ref(false);
 
 const fullScreenChange = (value) => {
     emit("fullScreenChange", value);
+};
+
+const sendLog = (id, eventStr) => {
+    LogAdaptor.DataEmitter({
+        id: id,
+        event: eventStr,
+    });
 };
 
 onMounted(() => {
@@ -139,6 +148,7 @@ onMounted(() => {
                     canvasItem.canvas.height = msg.data.height;
                     canvasItem.ctx.putImageData(strategyImgs[msg.info], 0, 0);
                     load.loading = false;
+                    sendLog("motionrug", `set pixel: ${msg.info}`);
                 }
             }
         });

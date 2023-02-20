@@ -2,10 +2,11 @@
 import MotionRugs from "./MotionRugs.vue";
 import SideBar from "./SideBar.vue";
 import Settings from "./Settings.vue";
+import Log from "./Log.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { onMounted, reactive } from "vue";
-import { GPSAdaptor } from "./Adaptor.js";
+import { GPSAdaptor, LogAdaptor } from "./Adaptor.js";
 import "tilelayer-canvas";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors, FILE_COUNT } from "./Constants.js";
@@ -88,6 +89,8 @@ const initMap = () => {
     ).addTo(map);
 
     config.map = map;
+
+    sendLog(null, "Map initialized.");
 };
 
 // 添加载具
@@ -183,6 +186,7 @@ const displaySmearChangeHandler = (isDisplay) => {
             }
         }
     }
+    sendLog(null, "Display smear: " + isDisplay);
 };
 
 const displaySmearLengthChangeHandler = (length) => {
@@ -198,6 +202,7 @@ const displaySmearLengthChangeHandler = (length) => {
             vehicles.smear[i].opacityGap = 0.4;
         }
     }
+    sendLog(null, "Display smear length: " + length);
 };
 
 const removeAllSmear = () => {
@@ -208,6 +213,7 @@ const removeAllSmear = () => {
             }
         }
     }
+    sendLog(null, "All smear removed.");
 };
 
 // 添加轨迹
@@ -275,6 +281,7 @@ const toggleHandler = (id) => {
     } else {
         vehicles.state[id].isRunning = !vehicles.state[id].isRunning;
         vehicles.move[id].motion.motionToggle();
+        sendLog(id, `Vehicle ${id} is ${vehicles.state[id].isRunning ? "running" : "stopped"}.`);
     }
 };
 
@@ -284,6 +291,8 @@ const changeRangeHandler = (range, highlightValue) => {
     setTimeout(() => {
         removeAllTrajectory();
     }, 2000);
+
+    sendLog(null, `Change range x to ${range}, highlight value is ${highlightValue}.`);
 };
 
 const changeRangeYHandler = (range, highlightValue) => {
@@ -301,6 +310,8 @@ const changeRangeYHandler = (range, highlightValue) => {
     setTimeout(() => {
         removeAllTrajectory();
     }, 2000);
+
+    sendLog(null, `Change range y to ${range}, highlight value is ${highlightValue}.`);
 };
 
 const displayTrajectoryChangeHandler = (id) => {
@@ -312,7 +323,6 @@ const displayTrajectoryChangeHandler = (id) => {
         const end = config.sliderRange[1];
         const realEnd = Math.min(end, vehicles.move[id].latLngList.length - 1);
         const realLatLngList = vehicles.move[id].latLngList.slice(start, realEnd);
-        console.log(`display trajectory of vehicle ${id} in range ${start} to ${realEnd}`);
 
         vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
         vehicles.move[id].trajetory.addTo(config.map);
@@ -327,7 +337,6 @@ const showTrajectoryInRangeFrame = (range) => {
         if (vehicles.state[id].displayTrajectory) {
             const realEnd = Math.min(range[1], vehicles.move[id].latLngList.length - 1);
             const realLatLngList = vehicles.move[id].latLngList.slice(range[0], realEnd);
-            console.log(`display trajectory of vehicle ${id} in range ${range[0]} to ${realEnd}`);
 
             vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
             vehicles.move[id].trajetory.addTo(config.map);
@@ -365,6 +374,8 @@ const fullScreenChangeHandler = (value) => {
             document.msExitFullscreen();
         }
     }
+
+    sendLog(null, `Full screen is ${value ? "on" : "off"}.`);
 };
 
 const findVehicleHandler = (id) => {
@@ -394,6 +405,8 @@ const findVehicleHandler = (id) => {
             }, 2000);
         }
     }
+
+    sendLog(null, `Find vehicle ${id}.`);
 };
 
 const lockVehicleHandler = (id) => {
@@ -423,6 +436,8 @@ const lockVehicleHandler = (id) => {
             }
         }
     }
+
+    sendLog(null, `Lock vehicle ${id} is ${vehicles.state[id].locked ? "on" : "off"}.`);
 };
 
 const iconChangeHandler = (id, iconName) => {
@@ -444,6 +459,8 @@ const removeAllTrajectory = () => {
             vehicles.move[id].trajetory.remove();
         }
     }
+
+    sendLog(null, `Remove all trajectory.`);
 };
 
 const pixelHighlightChangeHandler = (value) => {
@@ -455,6 +472,15 @@ const pixelHighlightChangeHandler = (value) => {
         }
         removeAllTrajectory();
     }
+
+    sendLog(null, `Pixel highlight is ${value ? "on" : "off"}.`);
+};
+
+const sendLog = (id, eventStr) => {
+    LogAdaptor.DataEmitter({
+        id: id,
+        event: eventStr,
+    });
 };
 
 onMounted(() => {
@@ -565,13 +591,13 @@ onMounted(() => {
 
                                 <div class="leaflet-sidebar-pane" id="log">
                                     <h1 class="leaflet-sidebar-header">
-                                        some logs
+                                        Logs
                                         <div class="leaflet-sidebar-close">
                                             <el-icon><DArrowLeft /></el-icon>
                                         </div>
                                     </h1>
                                     <div style="margin-top: 10px">
-                                        <el-empty description="todo something... 2"></el-empty>
+                                        <Log></Log>
                                     </div>
                                 </div>
                                 <div class="leaflet-sidebar-pane" id="todo-97">
