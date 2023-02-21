@@ -236,13 +236,10 @@ onMounted(() => {
     margin-left: 12px;
     margin-right: 12px;
     width: 5%;
-    /* margin-bottom: 12px; */
-    /* line-height: 90px; */
 }
 .slider-y {
     margin-top: 0;
     padding-bottom: 12px;
-    /* margin-bottom: 12px; */
 }
 #canvas {
     margin-top: 12px;

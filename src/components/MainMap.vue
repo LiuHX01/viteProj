@@ -290,9 +290,7 @@ const addDynamicLine = (id) => {
                     }
                 )
                 .addTo(config.map);
-            // if (vehicles.state[id].locked) {
-            //     config.map.setView(currLatLng, config.map.getZoom());
-            // }
+
             vehicles.state[id].frame++;
         }
     }
@@ -633,9 +631,7 @@ onMounted(() => {
                                 <ul role="tablist">
                                     <li>
                                         <a href="#vehicleStatus" role="tab">
-                                            <!-- <el-badge is-dot :value="12"> -->
                                             <img src="/shebeizhuangtai.svg" />
-                                            <!-- </el-badge> -->
                                         </a>
                                     </li>
                                     <li>
@@ -726,9 +722,7 @@ onMounted(() => {
                                         todo-98
                                         <div class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></div>
                                     </h1>
-                                    <div style="margin-top: 10px">
-                                        <!-- <user-descriptions></user-descriptions> -->
-                                    </div>
+                                    <div style="margin-top: 10px"></div>
                                 </div>
                                 <div class="leaflet-sidebar-pane" id="todo-99">
                                     <h1 class="leaflet-sidebar-header">
@@ -750,13 +744,6 @@ onMounted(() => {
                 ></MotionRugs>
             </el-footer>
         </el-container>
-        <!-- <el-aside width="300px"> -->
-        <!-- <SideBar
-                :vstates="vehicles.state"
-                @toggle="toggleHandler"
-                @displayTrajectoryChange="displayTrajectoryChangeHandler"
-            ></SideBar> -->
-        <!-- </el-aside> -->
     </el-container>
 </template>
 
@@ -768,7 +755,6 @@ onMounted(() => {
 #map {
     width: 100%;
     height: 100%;
-    /* margin-bottom: 10px; */
 }
 #main-container {
     width: 100%;
