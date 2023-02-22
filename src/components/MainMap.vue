@@ -100,6 +100,10 @@ const initMap = (sourceName) => {
         curr.view = config.map.getCenter();
     });
 
+    setInterval(() => {
+        curr.view = config.map.getCenter();
+    }, 1000);
+
     config.map.on("click", (e) => {
         if (config.trackedVehicle) {
             config.trackedLines.push(e.latlng);
