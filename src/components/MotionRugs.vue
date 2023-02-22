@@ -154,6 +154,33 @@ onMounted(() => {
     });
 });
 
+const dragSelect = ref(false);
+const dragSelectRange = ref([0, 0, 0, 0]);
+
+const getStartPosition = (e) => {
+    dragSelectRange.value[0] = e.offsetX;
+    dragSelectRange.value[1] = canvasItem.canvas.height - e.offsetY;
+};
+
+const getEndPosition = (e) => {
+    dragSelectRange.value[2] = e.offsetX;
+    dragSelectRange.value[3] = canvasItem.canvas.height - e.offsetY;
+    if (dragSelectRange.value[0] > dragSelectRange.value[2]) {
+        [dragSelectRange.value[0], dragSelectRange.value[2]] = [dragSelectRange.value[2], dragSelectRange.value[0]];
+    }
+    if (dragSelectRange.value[1] > dragSelectRange.value[3]) {
+        [dragSelectRange.value[1], dragSelectRange.value[3]] = [dragSelectRange.value[3], dragSelectRange.value[1]];
+    }
+
+    if (dragSelect.value) {
+        valueX.value = [dragSelectRange.value[0], dragSelectRange.value[2]];
+        valueY.value = [dragSelectRange.value[1], dragSelectRange.value[3]];
+    }
+    if (maskValue.value) {
+        changeRangeY([dragSelectRange.value[1], dragSelectRange.value[3]]);
+    }
+};
+
 /**
  * @function 清除画布所有内容，重新绘制当前策略下的像素
  */
@@ -194,18 +221,21 @@ const sliderYHeight = computed(() => {
                                 />
                             </el-select>
                         </div>
-                        <div class="switchs">
+                        <div class="switchs" style="margin-top: 5px">
                             <el-switch
                                 v-model="pixelHighlightValue"
                                 @change="pixelHighlightChange"
+                                inline-prompt
+                                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                                 active-text="轨迹开"
                                 inactive-text="轨迹关"
                             />
-                        </div>
-                        <div clas="switchs">
+                            &nbsp;
                             <el-switch
                                 v-model="maskValue"
                                 @change="maskValueChange"
+                                inline-prompt
+                                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                                 active-text="遮照开"
                                 inactive-text="遮照关"
                             />
@@ -214,8 +244,18 @@ const sliderYHeight = computed(() => {
                             <el-switch
                                 v-model="fullScreenValue"
                                 @change="fullScreenChange"
+                                inline-prompt
+                                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                                 active-text="全屏开"
                                 inactive-text="全屏关"
+                            />
+                            &nbsp;
+                            <el-switch
+                                v-model="dragSelect"
+                                inline-prompt
+                                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                                active-text="拖选开"
+                                inactive-text="拖选关"
                             />
                         </div>
                     </el-main>
@@ -241,7 +281,7 @@ const sliderYHeight = computed(() => {
                     <el-main>
                         <!-- <div style="margin-right: 20px"> -->
                         <el-scrollbar element-loading-background="rgba(235,235,235,1)">
-                            <canvas id="canvas"></canvas>
+                            <canvas id="canvas" @mousedown="getStartPosition" @mouseup="getEndPosition"></canvas>
                         </el-scrollbar>
                         <!-- </div> -->
                     </el-main>
@@ -262,7 +302,7 @@ const sliderYHeight = computed(() => {
 
 <style scoped>
 .el-scrollbar {
-    display: inline-block;
+    display: inline;
     width: 99%;
 }
 #motionrug-container {

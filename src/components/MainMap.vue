@@ -318,7 +318,6 @@ const changeRangeYHandler = (range, highlightValue) => {
 
     for (let id in vehicles.state) {
         if (id >= config.sliderRangeY[0] && id <= config.sliderRangeY[1] && highlightValue) {
-            console.log(id);
             vehicles.state[id].displayTrajectory = true;
         } else {
             vehicles.state[id].displayTrajectory = false;
