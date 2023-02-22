@@ -9,7 +9,7 @@ import { onMounted, reactive } from "vue";
 import { GPSAdaptor } from "./Adaptor.js";
 import { sendLog } from "./Methods.js";
 import "leaflet.motion/dist/leaflet.motion.min.js";
-import { colors, FILE_COUNT, tileLayerSources } from "./Constants.js";
+import { colors, FILE_COUNT, tileLayerSources, numIcons } from "./Constants.js";
 import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import "leaflet-sidebar-v2/js/leaflet-sidebar.js";
@@ -107,7 +107,18 @@ const initMap = (sourceName) => {
     config.map.on("click", (e) => {
         if (config.trackedVehicle) {
             config.trackedLines.push(e.latlng);
-            config.trackMarkers.push(L.marker(e.latlng).addTo(config.map));
+            config.trackMarkers.push(
+                L.marker(e.latlng, {
+                    icon: L.divIcon({
+                        className: "my-div-icon",
+                        html: numIcons[
+                            config.trackMarkers.length > numIcons.length - 1
+                                ? numIcons.length - 1
+                                : config.trackMarkers.length - 1
+                        ],
+                    }),
+                }).addTo(config.map)
+            );
         }
     });
 
@@ -757,5 +768,10 @@ onMounted(() => {
 }
 .leaflet-sidebar-close {
     top: 2px;
+}
+.my-div-icon {
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
 }
 </style>
