@@ -157,6 +157,12 @@ onMounted(() => {
 const dragSelect = ref(false);
 const dragSelectRange = ref([0, 0, 0, 0]);
 
+const dragSelectChange = (isOpen) => {
+    if (isOpen) {
+        maskValue.value = true;
+    }
+};
+
 const getStartPosition = (e) => {
     dragSelectRange.value[0] = e.offsetX;
     dragSelectRange.value[1] = canvasItem.canvas.height - e.offsetY;
@@ -245,13 +251,14 @@ const sliderYHeight = computed(() => {
                                 v-model="fullScreenValue"
                                 @change="fullScreenChange"
                                 inline-prompt
-                                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                                style="--el-switch-on-color: #e6a23c; --el-switch-off-color: #409eff"
                                 active-text="全屏开"
                                 inactive-text="全屏关"
                             />
                             &nbsp;
                             <el-switch
                                 v-model="dragSelect"
+                                @change="dragSelectChange"
                                 inline-prompt
                                 style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                                 active-text="拖选开"
