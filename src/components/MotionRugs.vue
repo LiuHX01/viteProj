@@ -160,6 +160,7 @@ const dragSelectRange = ref([0, 0, 0, 0]);
 const dragSelectChange = (isOpen) => {
     if (isOpen) {
         maskValue.value = true;
+        maskValueChange(isOpen);
     }
 };
 
