@@ -11,12 +11,12 @@ LogAdaptor.DataListener((data) => {
     const currDate = new Date();
     const currDateStr = `${currDate.getFullYear()}-${currDate.getMonth()}-${currDate.getDate()}`;
     const currTimeStr = `${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`;
-    const { id, event } = data;
+    const { id, eventStr } = data;
     colomns.push({
         date: currDateStr,
         time: currTimeStr,
         id: id,
-        event: event,
+        eventStr: eventStr,
     });
 
     if (colomns.length > MAX_LOG_COUNT) {
@@ -31,7 +31,7 @@ LogAdaptor.DataListener((data) => {
             <el-table-column prop="date" label="Date" width="95" align="center"></el-table-column>
             <el-table-column prop="time" label="Time" width="95" align="center"></el-table-column>
             <!-- <el-table-column prop="id" label="Id" width="50" align="center"></el-table-column> -->
-            <el-table-column prop="event" label="Event" align="center"></el-table-column>
+            <el-table-column prop="eventStr" label="Event" align="center"></el-table-column>
         </el-table>
     </el-auto-resizer>
 </template>

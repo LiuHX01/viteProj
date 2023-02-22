@@ -16,6 +16,8 @@ class DataAdaptor {
     }
 }
 
-export const GPSAdaptor = new DataAdaptor("GPSData");
-export const MotionAdaptor = new DataAdaptor("MotionData");
-export const LogAdaptor = new DataAdaptor("LogData");
+const GPSAdaptor = new DataAdaptor("GPSData");
+const MotionAdaptor = new DataAdaptor("MotionData");
+const LogAdaptor = new DataAdaptor("LogData");
+
+export { GPSAdaptor, MotionAdaptor, LogAdaptor };

@@ -124,7 +124,7 @@ const fullScreenChange = (value) => {
 const sendLog = (id, eventStr) => {
     LogAdaptor.DataEmitter({
         id: id,
-        event: eventStr,
+        eventStr: eventStr,
     });
 };
 

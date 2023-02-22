@@ -41,7 +41,7 @@ onMounted(() => {
 
                     LogAdaptor.DataEmitter({
                         id: info,
-                        event: `Vehicle ${info} loaded.`,
+                        eventStr: `Vehicle ${info} loaded.`,
                     });
                 });
         }

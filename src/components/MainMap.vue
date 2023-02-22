@@ -8,7 +8,7 @@ import * as L from "leaflet";
 import { onMounted, reactive, ref } from "vue";
 import { GPSAdaptor, LogAdaptor } from "./Adaptor.js";
 import "leaflet.motion/dist/leaflet.motion.min.js";
-import { colors, FILE_COUNT } from "./Constants.js";
+import { colors, FILE_COUNT, tileLayerSources } from "./Constants.js";
 import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
 import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import "leaflet-sidebar-v2/js/leaflet-sidebar.js";
@@ -48,19 +48,6 @@ const curr = reactive({
         lng: 116.38876,
     },
 });
-
-const tileLayerSources = {
-    stadiaMaps: {
-        light: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
-        dark: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
-        voyager: "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",
-    },
-    baseMaps: {
-        light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        voyager: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    },
-};
 
 const vehicles = reactive({ state: {}, move: {}, smear: {}, settedTracks: {} });
 
@@ -510,7 +497,7 @@ const pixelHighlightChangeHandler = (value) => {
 const sendLog = (id, eventStr) => {
     LogAdaptor.DataEmitter({
         id: id,
-        event: eventStr,
+        eventStr: eventStr,
     });
 };
 
