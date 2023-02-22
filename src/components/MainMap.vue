@@ -35,7 +35,7 @@ const config = reactive({
             iconSize: [16, 16],
         }),
     },
-    sliderRange: [0, 50],
+    sliderRangeX: [0, 50],
     sliderRangeY: [1, FILE_COUNT],
 
     trackedVehicle: null,
@@ -50,7 +50,7 @@ const curr = reactive({
     },
 });
 
-const vehicles = reactive({ state: {}, move: {}, smear: {}, settedTracks: {} });
+const vehicles = reactive({ state: {}, move: {}, smear: {} });
 
 // 初始化地图
 const initMap = (sourceName) => {
@@ -302,31 +302,33 @@ const toggleHandler = (id) => {
     }
 };
 
-const changeRangeHandler = (range, highlightValue) => {
-    config.sliderRange = range;
-    showTrajectoryInRangeFrame(config.sliderRange);
-    setTimeout(() => {
-        removeAllTrajectory();
-    }, 2000);
+const changeRangeXHandler = (range, highlightValue) => {
+    config.sliderRangeX = range;
+
+    showTrajectoryInRangeFrame(config.sliderRangeX);
+    // setTimeout(() => {
+    //     removeAllTrajectory();
+    // }, 2000);
 
     sendLog(null, `Change range x to ${range}, highlight value is ${highlightValue}.`);
 };
 
 const changeRangeYHandler = (range, highlightValue) => {
     config.sliderRangeY = range;
-    console.log(`change range y to ${range}, highlight value is ${highlightValue}`);
+
     for (let id in vehicles.state) {
         if (id >= config.sliderRangeY[0] && id <= config.sliderRangeY[1] && highlightValue) {
+            console.log(id);
             vehicles.state[id].displayTrajectory = true;
         } else {
             vehicles.state[id].displayTrajectory = false;
         }
     }
 
-    showTrajectoryInRangeFrame(config.sliderRange);
-    setTimeout(() => {
-        removeAllTrajectory();
-    }, 2000);
+    showTrajectoryInRangeFrame(config.sliderRangeX);
+    // setTimeout(() => {
+    //     removeAllTrajectory();
+    // }, 2000);
 
     sendLog(null, `Change range y to ${range}, highlight value is ${highlightValue}.`);
 };
@@ -336,8 +338,8 @@ const displayTrajectoryChangeHandler = (id) => {
     if (!vehicles.state[id].displayTrajectory && vehicles.move[id].trajetory) {
         vehicles.move[id].trajetory.remove();
     } else {
-        const start = config.sliderRange[0];
-        const end = config.sliderRange[1];
+        const start = config.sliderRangeX[0];
+        const end = config.sliderRangeX[1];
         const realEnd = Math.min(end, vehicles.move[id].latLngList.length - 1);
         const realLatLngList = vehicles.move[id].latLngList.slice(start, realEnd);
 
@@ -553,7 +555,6 @@ const setPathEndHandler = (id) => {
 };
 
 const deletePathHandler = (id) => {
-    console.log(`delete path ${id}`);
     config.trackMarkers.forEach((marker) => {
         marker.remove();
     });
@@ -718,7 +719,7 @@ onMounted(() => {
             </el-main>
             <el-footer>
                 <MotionRugs
-                    @changeRange="changeRangeHandler"
+                    @changeRangeX="changeRangeXHandler"
                     @fullScreenChange="fullScreenChangeHandler"
                     @changeRangeY="changeRangeYHandler"
                     @pixelHighlightChange="pixelHighlightChangeHandler"
@@ -743,7 +744,7 @@ onMounted(() => {
     flex-shrink: 0;
 }
 .el-container {
-    height: 87%;
+    height: 89%;
 }
 .el-main {
     padding: 0 0;

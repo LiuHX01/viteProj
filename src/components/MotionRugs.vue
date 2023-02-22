@@ -1,17 +1,15 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, computed } from "vue";
 import { MotionAdaptor } from "./Adaptor";
 import { FRAME_LENGTH, FILE_COUNT } from "./Constants.js";
 import { myWorker } from "./MyWorker.js";
 import { sendLog } from "./Methods.js";
 
-const emit = defineEmits(["changeRange", "fullScreenChange", "changeRangeY", "pixelHighlightChange"]);
+const emit = defineEmits(["fullScreenChange", "changeRangeX", "changeRangeY", "pixelHighlightChange"]);
 
-const load = reactive({
-    loading: true,
-});
-const valueX = ref([0, 50]);
-const valueY = ref([1, FILE_COUNT]);
+const load = ref(true);
+const valueX = ref([0, 40]);
+const valueY = ref([1, FILE_COUNT - 30]);
 
 const canvasItem = {
     canvas: null,
@@ -19,80 +17,91 @@ const canvasItem = {
     highlight: false,
 };
 
-const pixelHighlightValue = ref(false);
+const maskValue = ref(false);
 
-// TODO: 这里
-const pixelHighlightChange = (value) => {
-    emit("pixelHighlightChange", value);
-    if (value) {
+const maskValueChange = (isOpen) => {
+    if (isOpen) {
         drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
     } else {
         if (canvasItem.ctx) {
-            canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
-            canvasItem.ctx.putImageData(strategyImgs[strategyValue.value], 0, 0);
+            reDrawPixel();
             canvasItem.highlight = false;
         }
     }
 };
 
-const changeRange = (range) => {
-    emit("changeRange", range, pixelHighlightValue.value);
-    if (pixelHighlightValue.value) {
-        drawMask(range[0], range[1], valueY.value[0], valueY.value[1]);
+const pixelHighlightValue = ref(false);
+
+/**
+ * @function open时，当maskValue为true时，显示轨迹，否则不显示
+ * @param {Boolean} isOpen
+ */
+const pixelHighlightChange = (isOpen) => {
+    emit("pixelHighlightChange", isOpen);
+
+    // if (isOpen) {
+    //     drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
+    // } else {
+    //     if (canvasItem.ctx) {
+    //         reDrawPixel();
+    //         canvasItem.highlight = false;
+    //     }
+    // }
+};
+
+const changeRangeX = (range) => {
+    emit("changeRangeX", range, pixelHighlightValue.value);
+    if (canvasItem.highlight) {
+        drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
     }
 };
 
 const changeRangeY = (range) => {
     emit("changeRangeY", range, pixelHighlightValue.value);
-    if (pixelHighlightValue.value) {
-        drawMask(valueX.value[0], valueX.value[1], range[0], range[1]);
+    if (canvasItem.highlight) {
+        drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
     }
 };
 
 const drawMask = (start, end, startY, endY) => {
-    console.log(`draw mask: ${start}, ${end}, ${startY}, ${endY}`);
     if (canvasItem.ctx) {
         if (canvasItem.highlight) {
-            canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
-            canvasItem.ctx.putImageData(strategyImgs[strategyValue.value], 0, 0);
+            reDrawPixel();
             canvasItem.highlight = false;
         }
         const frontX = 0;
         const frontY = 0;
         const frontWidth = start;
         const frontHeight = canvasItem.canvas.height;
-        canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        canvasItem.ctx.fillRect(frontX, frontY, frontWidth, frontHeight);
 
         const backX = end;
         const backY = 0;
         const backWidth = canvasItem.canvas.width - end;
         const backHeight = canvasItem.canvas.height;
-        canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        canvasItem.ctx.fillRect(backX, backY, backWidth, backHeight);
 
         const topX = start;
         const topY = 0;
         const topWidth = end - start;
         const topHeight = canvasItem.canvas.height - endY;
-        canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        canvasItem.ctx.fillRect(topX, topY, topWidth, topHeight);
 
         const bottomX = start;
         const bottomY = canvasItem.canvas.height - startY;
         const bottomWidth = end - start;
         const bottomHeight = startY;
+
         canvasItem.ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         canvasItem.ctx.fillRect(bottomX, bottomY, bottomWidth, bottomHeight);
+        canvasItem.ctx.fillRect(frontX, frontY, frontWidth, frontHeight);
+        canvasItem.ctx.fillRect(backX, backY, backWidth, backHeight);
+        canvasItem.ctx.fillRect(topX, topY, topWidth, topHeight);
 
         canvasItem.highlight = true;
 
-        /**
-         * startY:30 - endY:70
-         */
         sendLog("motionrug", `draw mask: ${start}, ${end}, ${startY}, ${endY}`);
     }
 };
+
+const strategyFeature = ref("speed");
 
 const strategyValue = ref("Hilbert");
 
@@ -103,14 +112,12 @@ const strategyImgs = {};
 const changeStrategy = (strategyName) => {
     if (canvasItem.ctx) {
         if (strategyImgs[strategyName]) {
-            canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
-            canvasItem.ctx.putImageData(strategyImgs[strategyName], 0, 0);
-            if (pixelHighlightValue.value) {
+            reDrawPixel();
+            if (maskValue.value) {
                 drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
             }
             sendLog("motionrug", `change strategy to ${strategyName}`);
         } else {
-            console.log("no such strategy");
             sendLog("motionrug", `no such strategy ${strategyName}`);
         }
     }
@@ -127,9 +134,7 @@ onMounted(() => {
     canvasItem.ctx = canvas.getContext("2d");
 
     MotionAdaptor.DataListener((data) => {
-        const currFeature = "speed";
-
-        myWorker.sendMsg(data, "setPixel", currFeature);
+        myWorker.sendMsg(data, "setPixel", strategyFeature.value);
         myWorker.onMsg((msg) => {
             if (msg.type === "setPixel") {
                 strategyImgs[msg.info] = msg.data.img;
@@ -141,101 +146,146 @@ onMounted(() => {
                     canvasItem.canvas.width = msg.data.width;
                     canvasItem.canvas.height = msg.data.height;
                     canvasItem.ctx.putImageData(strategyImgs[msg.info], 0, 0);
-                    load.loading = false;
+                    load.value = false;
                     sendLog("motionrug", `set pixel: ${msg.info}`);
                 }
             }
         });
     });
 });
+
+/**
+ * @function 清除画布所有内容，重新绘制当前策略下的像素
+ */
+const reDrawPixel = () => {
+    canvasItem.ctx.clearRect(0, 0, canvasItem.canvas.width, canvasItem.canvas.height);
+    canvasItem.ctx.putImageData(strategyImgs[strategyValue.value], 0, 0);
+};
+
+const sliderYHeight = computed(() => {
+    if (FILE_COUNT <= 40) {
+        return "40px";
+    } else {
+        return `${FILE_COUNT - 15}px`;
+    }
+});
 </script>
 
 <template>
-    <div id="motionrug-container" v-loading="load.loading">
-        <div class="slider-y-container">
-            <el-slider
-                class="slider-y"
-                v-model="valueY"
-                range
-                :max="FILE_COUNT"
-                :min="1"
-                :step="-1"
-                vertical
-                height="90px"
-                @change="changeRangeY"
-            />
-        </div>
-        <el-scrollbar element-loading-background="rgba(235,235,235,1)">
-            <canvas id="canvas"></canvas>
-        </el-scrollbar>
-        <div class="slider-demo-block">
-            <el-select
-                :teleported="false"
-                v-model="strategyValue"
-                class="m-2"
-                placeholder="Select"
-                @change="changeStrategy"
-            >
-                <el-option v-for="item in strategyOptions" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-            &nbsp;&nbsp;
-            <el-switch
-                v-model="pixelHighlightValue"
-                @change="pixelHighlightChange"
-                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                inline-prompt
-                active-text="mask开"
-                inactive-text="mask关"
-            />
-            <el-slider
-                style="padding-left: 10px; padding-right: 10px"
-                v-model="valueX"
-                range
-                :max="FRAME_LENGTH"
-                @change="changeRange"
-            />
-            <el-switch
-                v-model="fullScreenValue"
-                @change="fullScreenChange"
-                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                inline-prompt
-                active-text="全屏开"
-                inactive-text="全屏关"
-            />
-        </div>
+    <div id="motionrug-container" v-loading="load">
+        <el-container>
+            <el-aside width="200px">
+                <el-container>
+                    <el-main class="controler">
+                        <div>
+                            <el-select
+                                :teleported="false"
+                                v-model="strategyValue"
+                                :style="{ width: '130px' }"
+                                class="m-2"
+                                placeholder="Null"
+                                @change="changeStrategy"
+                            >
+                                <el-option
+                                    v-for="item in strategyOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                />
+                            </el-select>
+                        </div>
+                        <div class="switchs">
+                            <el-switch
+                                v-model="pixelHighlightValue"
+                                @change="pixelHighlightChange"
+                                active-text="轨迹开"
+                                inactive-text="轨迹关"
+                            />
+                        </div>
+                        <div clas="switchs">
+                            <el-switch
+                                v-model="maskValue"
+                                @change="maskValueChange"
+                                active-text="遮照开"
+                                inactive-text="遮照关"
+                            />
+                        </div>
+                        <div class="switchs">
+                            <el-switch
+                                v-model="fullScreenValue"
+                                @change="fullScreenChange"
+                                active-text="全屏开"
+                                inactive-text="全屏关"
+                            />
+                        </div>
+                    </el-main>
+                    <el-aside width="40px">
+                        <el-main style="height: 126px; text-align: center">
+                            <el-slider
+                                :style="{ top: '-5px' }"
+                                v-model="valueY"
+                                range
+                                :max="FILE_COUNT"
+                                :min="1"
+                                vertical
+                                :height="sliderYHeight"
+                                @change="changeRangeY"
+                            />
+                        </el-main>
+                        <el-footer></el-footer>
+                    </el-aside>
+                </el-container>
+            </el-aside>
+            <el-main>
+                <el-container>
+                    <el-main>
+                        <!-- <div style="margin-right: 20px"> -->
+                        <el-scrollbar element-loading-background="rgba(235,235,235,1)">
+                            <canvas id="canvas"></canvas>
+                        </el-scrollbar>
+                        <!-- </div> -->
+                    </el-main>
+                    <el-footer style="height=10px; margin-right: 30px;">
+                        <el-slider
+                            style="margin-left: 10px; height: 12px"
+                            v-model="valueX"
+                            range
+                            :max="FRAME_LENGTH"
+                            @change="changeRangeX"
+                        />
+                    </el-footer>
+                </el-container>
+            </el-main>
+        </el-container>
     </div>
 </template>
 
 <style scoped>
 .el-scrollbar {
     display: inline-block;
-    width: 95%;
+    width: 99%;
 }
 #motionrug-container {
     background-color: #fff;
 }
-.slider-demo-block {
-    display: flex;
-    align-items: center;
-    margin-left: 12px;
-    margin-right: 12px;
-}
-.slider-demo-block .el-slider {
-    margin-top: 0;
-    margin-left: 12px;
-}
-.slider-y-container {
-    display: inline;
-    align-items: center;
-    margin-left: 12px;
-    margin-right: 12px;
-    width: 5%;
-}
-.slider-y {
-    margin-top: 0;
-    padding-bottom: 12px;
-}
 #canvas {
     margin-top: 12px;
+}
+
+.el-container,
+.el-aside,
+.el-main,
+.el-footer {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.el-footer {
+    height: 15px;
+}
+.controler {
+    margin-top: 10px;
+    margin-left: 10px;
 }
 </style>

@@ -224,8 +224,6 @@ class MotionRugsDataSet {
         this.baseData = this.#getBaseData(this.data);
         this.features.forEach((feature) => {
             if (feature === "speed") {
-                console.time("sort");
-
                 const sortedFeatureValue = this.data
                     .reduce((a, b) => {
                         return a.concat(b);
@@ -239,7 +237,6 @@ class MotionRugsDataSet {
                     if (!this.deciles[feature]) this.deciles[feature] = [];
                     this.deciles[feature].push(parseFloat(this.#getPercentile(feature, sortedFeatureValue, i * 10)));
                 }
-                console.timeEnd("sort");
             }
         });
     }
