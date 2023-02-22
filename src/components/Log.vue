@@ -4,30 +4,27 @@ import { LogAdaptor } from "./Adaptor";
 
 // 自：日期、时间
 // 传：编号、信息
-const colomns = reactive([]);
+const logs = reactive([]);
 const MAX_LOG_COUNT = 1000;
 
 LogAdaptor.DataListener((data) => {
-    const currDate = new Date();
-    const currDateStr = `${currDate.getFullYear()}-${currDate.getMonth()}-${currDate.getDate()}`;
-    const currTimeStr = `${currDate.getHours()}:${currDate.getMinutes()}:${currDate.getSeconds()}`;
-    const { id, eventStr } = data;
-    colomns.push({
-        date: currDateStr,
-        time: currTimeStr,
+    const { id, eventStr, date, time } = data;
+    logs.push({
+        date: date,
+        time: time,
         id: id,
         eventStr: eventStr,
     });
 
-    if (colomns.length > MAX_LOG_COUNT) {
-        colomns.shift();
+    if (logs.length > MAX_LOG_COUNT) {
+        logs.shift();
     }
 });
 </script>
 
 <template>
     <el-auto-resizer>
-        <el-table :data="colomns" border :resizable="false">
+        <el-table :data="logs" border :resizable="false">
             <el-table-column prop="date" label="Date" width="95" align="center"></el-table-column>
             <el-table-column prop="time" label="Time" width="95" align="center"></el-table-column>
             <!-- <el-table-column prop="id" label="Id" width="50" align="center"></el-table-column> -->

@@ -5,6 +5,7 @@ import { GPSAdaptor, LogAdaptor, MotionAdaptor } from "./components/Adaptor.js";
 import csv from "csvtojson";
 import { myWorker } from "./components/MyWorker.js";
 import { FILE_COUNT } from "./components/Constants.js";
+import { sendLog } from "./components/Methods.js";
 
 let dataGroupByTime = [];
 let finished = ref(0);
@@ -39,10 +40,7 @@ onMounted(() => {
                     }
                     finished.value++;
 
-                    LogAdaptor.DataEmitter({
-                        id: info,
-                        eventStr: `Vehicle ${info} loaded.`,
-                    });
+                    sendLog("main", `load file ${info} finished`);
                 });
         }
     });

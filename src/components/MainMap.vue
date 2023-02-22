@@ -5,8 +5,9 @@ import Settings from "./Settings.vue";
 import Log from "./Log.vue";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import { onMounted, reactive, ref } from "vue";
-import { GPSAdaptor, LogAdaptor } from "./Adaptor.js";
+import { onMounted, reactive } from "vue";
+import { GPSAdaptor } from "./Adaptor.js";
+import { sendLog } from "./Methods.js";
 import "leaflet.motion/dist/leaflet.motion.min.js";
 import { colors, FILE_COUNT, tileLayerSources } from "./Constants.js";
 import "leaflet-fullscreen/dist/Leaflet.fullscreen.js";
@@ -492,13 +493,6 @@ const pixelHighlightChangeHandler = (value) => {
     }
 
     sendLog(null, `Pixel highlight is ${value ? "on" : "off"}.`);
-};
-
-const sendLog = (id, eventStr) => {
-    LogAdaptor.DataEmitter({
-        id: id,
-        eventStr: eventStr,
-    });
 };
 
 const latChangeHandler = (newLat) => {

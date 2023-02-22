@@ -1,4 +1,4 @@
-const FILE_COUNT = 90;
+const FILE_COUNT = 10;
 const FRAME_LENGTH = 2000;
 
 const colors = [

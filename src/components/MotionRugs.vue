@@ -1,8 +1,9 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import { MotionAdaptor, LogAdaptor } from "./Adaptor";
+import { MotionAdaptor } from "./Adaptor";
 import { FRAME_LENGTH, FILE_COUNT } from "./Constants.js";
 import { myWorker } from "./MyWorker.js";
+import { sendLog } from "./Methods.js";
 
 const emit = defineEmits(["changeRange", "fullScreenChange", "changeRangeY", "pixelHighlightChange"]);
 
@@ -119,13 +120,6 @@ const fullScreenValue = ref(false);
 
 const fullScreenChange = (value) => {
     emit("fullScreenChange", value);
-};
-
-const sendLog = (id, eventStr) => {
-    LogAdaptor.DataEmitter({
-        id: id,
-        eventStr: eventStr,
-    });
 };
 
 onMounted(() => {
