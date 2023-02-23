@@ -250,6 +250,14 @@ const removeAllSmear = () => {
     sendLog(null, "All smear removed.");
 };
 
+const motionRender = (id) => {
+    addDynamicLine(id);
+
+    vehicles.move[id].motion.on("motion-ended", () => {
+        motionRender(id);
+    });
+};
+
 // 添加轨迹
 const addDynamicLine = (id) => {
     if (vehicles.state[id].isRunning) {
@@ -264,7 +272,7 @@ const addDynamicLine = (id) => {
                     }
                 }
             }
-
+            vehicles.move[id].motion.off("motion-ended");
             vehicles.move[id].motion.remove();
             vehicles.state[id].isRunning = false;
         }
@@ -600,7 +608,8 @@ onMounted(() => {
                     addVehicle(id, L.latLng(lat, lng));
                 } else {
                     if (vehicles.move[id].latLngList.length === 2) {
-                        vehicles.move[id].timer = setInterval(addDynamicLine, config.duration, id);
+                        // vehicles.move[id].timer = setInterval(addDynamicLine, config.duration, id);
+                        motionRender(id);
                         setInterval(() => {
                             if (vehicles.move[id].motion) {
                                 vehicles.state[id].currLatLng = vehicles.move[id].motion.getMarkers()[0].getLatLng();
