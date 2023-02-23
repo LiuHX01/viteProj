@@ -155,8 +155,11 @@ onMounted(() => {
 });
 
 const dragSelect = ref(false);
+let drawControl = false;
+let drawed = false;
 const dragSelectRange = ref([0, 0, 0, 0]);
-
+const tempSelectRange = ref([0, 0, 0, 0]);
+let dragTimer = null;
 const dragSelectChange = (isOpen) => {
     if (isOpen) {
         maskValue.value = true;
@@ -167,9 +170,39 @@ const dragSelectChange = (isOpen) => {
 const getStartPosition = (e) => {
     dragSelectRange.value[0] = e.offsetX;
     dragSelectRange.value[1] = canvasItem.canvas.height - e.offsetY;
+    drawControl = true;
+    dragTimer = setInterval(() => {
+        drawed = false;
+    }, 1000 / 30);
+};
+
+const getTempPosition = (e) => {
+    if (dragSelect.value && drawControl && !drawed) {
+        tempSelectRange.value[0] = dragSelectRange.value[0];
+        tempSelectRange.value[1] = dragSelectRange.value[1];
+        tempSelectRange.value[2] = e.offsetX;
+        tempSelectRange.value[3] = canvasItem.canvas.height - e.offsetY;
+        if (tempSelectRange.value[0] > tempSelectRange.value[2]) {
+            [tempSelectRange.value[0], tempSelectRange.value[2]] = [tempSelectRange.value[2], tempSelectRange.value[0]];
+        }
+        if (tempSelectRange.value[1] > tempSelectRange.value[3]) {
+            [tempSelectRange.value[1], tempSelectRange.value[3]] = [tempSelectRange.value[3], tempSelectRange.value[1]];
+        }
+
+        if (dragSelect.value) {
+            valueX.value = [tempSelectRange.value[0], tempSelectRange.value[2]];
+            valueY.value = [tempSelectRange.value[1], tempSelectRange.value[3]];
+        }
+        if (maskValue.value) {
+            changeRangeY(tempSelectRange.value[1], tempSelectRange.value[3]);
+        }
+        drawed = true;
+    }
 };
 
 const getEndPosition = (e) => {
+    drawControl = false;
+    clearInterval(dragTimer);
     dragSelectRange.value[2] = e.offsetX;
     dragSelectRange.value[3] = canvasItem.canvas.height - e.offsetY;
     if (dragSelectRange.value[0] > dragSelectRange.value[2]) {
@@ -289,7 +322,12 @@ const sliderYHeight = computed(() => {
                     <el-main>
                         <!-- <div style="margin-right: 20px"> -->
                         <el-scrollbar element-loading-background="rgba(235,235,235,1)">
-                            <canvas id="canvas" @mousedown="getStartPosition" @mouseup="getEndPosition"></canvas>
+                            <canvas
+                                id="canvas"
+                                @mousedown="getStartPosition"
+                                @mouseup="getEndPosition"
+                                @mousemove="getTempPosition"
+                            ></canvas>
                         </el-scrollbar>
                         <!-- </div> -->
                     </el-main>
