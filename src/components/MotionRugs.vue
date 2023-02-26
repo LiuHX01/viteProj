@@ -10,6 +10,10 @@ const emit = defineEmits(["fullScreenChange", "changeRangeX", "changeRangeY", "p
 const load = ref(true);
 const valueX = ref([0, 40]);
 const valueY = ref([1, FILE_COUNT - 30]);
+let valueDraw = false;
+let valueTimer = setInterval(() => {
+    valueDraw = true;
+}, 100);
 
 const canvasItem = {
     canvas: null,
@@ -51,15 +55,18 @@ const pixelHighlightChange = (isOpen) => {
 
 const changeRangeX = (range) => {
     emit("changeRangeX", range, pixelHighlightValue.value);
-    if (canvasItem.highlight) {
+
+    if (canvasItem.highlight && valueDraw) {
         drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
+        valueDraw = false;
     }
 };
 
 const changeRangeY = (range) => {
     emit("changeRangeY", range, pixelHighlightValue.value);
-    if (canvasItem.highlight) {
+    if (canvasItem.highlight && valueDraw) {
         drawMask(valueX.value[0], valueX.value[1], valueY.value[0], valueY.value[1]);
+        valueDraw = false;
     }
 };
 
@@ -310,7 +317,7 @@ const sliderYHeight = computed(() => {
                                 :min="1"
                                 vertical
                                 :height="sliderYHeight"
-                                @change="changeRangeY"
+                                @input="changeRangeY"
                             />
                         </el-main>
                         <el-footer></el-footer>
@@ -337,7 +344,7 @@ const sliderYHeight = computed(() => {
                             v-model="valueX"
                             range
                             :max="FRAME_LENGTH"
-                            @change="changeRangeX"
+                            @input="changeRangeX"
                         />
                     </el-footer>
                 </el-container>
