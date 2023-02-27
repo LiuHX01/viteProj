@@ -201,7 +201,7 @@ const getTempPosition = (e) => {
             valueY.value = [tempSelectRange.value[1], tempSelectRange.value[3]];
         }
         if (maskValue.value) {
-            changeRangeY(tempSelectRange.value[1], tempSelectRange.value[3]);
+            changeRangeY([tempSelectRange.value[1], tempSelectRange.value[3]]);
         }
         drawed = true;
     }
