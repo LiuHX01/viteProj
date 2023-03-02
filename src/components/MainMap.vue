@@ -17,14 +17,19 @@ import "leaflet-sidebar-v2/css/leaflet-sidebar.css";
 import "leaflet-switch-basemap/src/L.switchBasemap.js";
 import "leaflet-switch-basemap/src/L.switchBasemap.css";
 
-const config = reactive({
-    map: null,
+let map = null;
+
+const mapConfig = {
+    createOpt: { preferCanvas: true, renderer: L.canvas(), attributionControl: false },
     sourceName: "baseMaps",
-    latLng: { lat: 39.92641, lng: 116.38876 },
+    initLatLng: [39.92641, 116.38876],
     zoom: 12,
     maxZoom: 14,
     minZoom: 11,
     duration: 1000,
+};
+
+const vehicleConfig = {
     icon: {
         UGV: L.icon({
             iconUrl: "/ugv.svg",
@@ -35,6 +40,9 @@ const config = reactive({
             iconSize: [16, 16],
         }),
     },
+};
+
+const config = reactive({
     sliderRangeX: [0, 50],
     sliderRangeY: [1, FILE_COUNT],
 
@@ -54,38 +62,34 @@ const vehicles = reactive({ state: {}, move: {}, smear: {} });
 
 // 初始化地图
 const initMap = (sourceName) => {
-    const map = L.map("map", {
-        preferCanvas: true,
-        renderer: L.canvas(),
-        attributionControl: false,
-    }).setView(config.latLng, config.zoom);
+    map = L.map("map", mapConfig.createOpt).setView(mapConfig.initLatLng, mapConfig.zoom);
 
     const { light, dark, voyager } = tileLayerSources[sourceName];
     new L.basemapsSwitcher(
         [
             {
                 layer: L.tileLayer(light, {
-                    zoom: config.zoom,
-                    maxZoom: config.maxZoom,
-                    minZoom: config.minZoom,
+                    zoom: mapConfig.zoom,
+                    maxZoom: mapConfig.maxZoom,
+                    minZoom: mapConfig.minZoom,
                 }).addTo(map),
                 icon: "/light.png",
                 name: "Light",
             },
             {
                 layer: L.tileLayer(dark, {
-                    zoom: config.zoom,
-                    maxZoom: config.maxZoom,
-                    minZoom: config.minZoom,
+                    zoom: mapConfig.zoom,
+                    maxZoom: mapConfig.maxZoom,
+                    minZoom: mapConfig.minZoom,
                 }),
                 icon: "/dark.png",
                 name: "Dark",
             },
             {
                 layer: L.tileLayer(voyager, {
-                    zoom: config.zoom,
-                    maxZoom: config.maxZoom,
-                    minZoom: config.minZoom,
+                    zoom: mapConfig.zoom,
+                    maxZoom: mapConfig.maxZoom,
+                    minZoom: mapConfig.minZoom,
                 }),
                 icon: "/voyager.png",
                 name: "Voyager",
@@ -94,17 +98,15 @@ const initMap = (sourceName) => {
         { position: "bottomright" }
     ).addTo(map);
 
-    config.map = map;
-
-    config.map.on("drag", () => {
-        curr.view = config.map.getCenter();
+    map.on("drag", () => {
+        curr.view = map.getCenter();
     });
 
     setInterval(() => {
-        curr.view = config.map.getCenter();
+        curr.view = map.getCenter();
     }, 1000);
 
-    config.map.on("click", (e) => {
+    map.on("click", (e) => {
         if (config.trackedVehicle) {
             config.trackedLines.push(e.latlng);
             config.trackMarkers.push(
@@ -117,7 +119,7 @@ const initMap = (sourceName) => {
                                 : config.trackMarkers.length - 1
                         ],
                     }),
-                }).addTo(config.map)
+                }).addTo(map)
             );
         }
     });
@@ -144,7 +146,7 @@ const addVehicle = (id, initLatLng) => {
         timer: null,
         trajetory: null,
         motionOpacity: 1,
-        icon: id < FILE_COUNT / 2 ? config.icon.UGV : config.icon.UAV,
+        icon: id < FILE_COUNT / 2 ? vehicleConfig.icon.UGV : vehicleConfig.icon.UAV,
         lockTimer: { lat: -1, lng: -1 },
     };
     vehicles.smear[id] = {
@@ -186,7 +188,7 @@ const handleSmear = (id) => {
             vehicles.smear[id].smearList[i].line = L.polyline([vehicles.move[id].motion.getLatLngs()[0], currLatLng], {
                 color: getColorById(id),
                 opacity: vehicles.smear[id].currOpacity,
-            }).addTo(config.map);
+            }).addTo(map);
         } else {
             // 其他线透明度减少
             if (vehicles.smear[id].smearList[i].line) {
@@ -289,7 +291,7 @@ const addDynamicLine = (id) => {
                     },
                     {
                         auto: true,
-                        duration: config.duration,
+                        duration: mapConfig.duration,
                         easing: L.Motion.Ease.swing,
                     },
                     {
@@ -300,7 +302,7 @@ const addDynamicLine = (id) => {
                             : vehicles.move[id].icon,
                     }
                 )
-                .addTo(config.map);
+                .addTo(map);
 
             vehicles.state[id].frame++;
         }
@@ -366,7 +368,7 @@ const displayTrajectoryChangeHandler = (id) => {
         const realLatLngList = vehicles.move[id].latLngList.slice(start, realEnd);
 
         vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
-        vehicles.move[id].trajetory.addTo(config.map);
+        vehicles.move[id].trajetory.addTo(map);
     }
 };
 
@@ -380,7 +382,7 @@ const showTrajectoryInRangeFrame = (range) => {
             const realLatLngList = vehicles.move[id].latLngList.slice(range[0], realEnd);
 
             vehicles.move[id].trajetory = L.polyline(realLatLngList, { color: getColorById(vehicles.state[id].id) });
-            vehicles.move[id].trajetory.addTo(config.map);
+            vehicles.move[id].trajetory.addTo(map);
         }
     }
 };
@@ -422,7 +424,7 @@ const fullScreenChangeHandler = (value) => {
 const findVehicleHandler = (id) => {
     const latLng = vehicles.move[id].latLngList[vehicles.state[id].frame];
     curr.view = latLng;
-    config.map.setView(latLng, config.map.getZoom());
+    map.setView(latLng, map.getZoom());
 
     const aimIcon = L.icon({
         iconUrl: "/aim.svg",
@@ -465,9 +467,9 @@ const lockVehicleHandler = (id) => {
                     if (vehicles.move[i].motion) {
                         const latLng = vehicles.move[i].motion.getMarkers()[0].getLatLng();
                         curr.view = latLng;
-                        config.map.setView(latLng, config.map.getZoom());
+                        map.setView(latLng, map.getZoom());
                     }
-                }, 100);
+                }, 200);
                 const lockIcon = L.icon({
                     iconUrl: "/aim.svg",
                     iconSize: [24, 24],
@@ -528,7 +530,7 @@ const latChangeHandler = (newLat) => {
         vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
     }
     curr.view.lat = newLat;
-    config.map.setView(curr.view, config.map.getZoom());
+    map.setView(curr.view, map.getZoom());
 };
 
 const lngChangeHandler = (newLng) => {
@@ -540,7 +542,7 @@ const lngChangeHandler = (newLng) => {
         vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
     }
     curr.view.lng = newLng;
-    config.map.setView(curr.view, config.map.getZoom());
+    map.setView(curr.view, map.getZoom());
 };
 
 const resetViewHandler = () => {
@@ -552,7 +554,7 @@ const resetViewHandler = () => {
         vehicles.move[i].motion.getMarkers()[0].setIcon(vehicles.move[i].icon);
     }
     curr.view = { lat: 39.92641, lng: 116.38876 };
-    config.map.setView(curr.view, config.map.getZoom());
+    map.setView(curr.view, map.getZoom());
 };
 
 const setPathStartHandler = (id) => {
@@ -589,14 +591,14 @@ const deletePathHandler = (id) => {
 };
 
 onMounted(() => {
-    initMap(config.sourceName);
-    config.map.zoomControl.setPosition("topright");
-    L.control.sidebar({ container: "sidebar" }).addTo(config.map);
+    initMap(mapConfig.sourceName);
+    map.zoomControl.setPosition("topright");
+    L.control.sidebar({ container: "sidebar" }).addTo(map);
     L.control
         .fullscreen({
             position: "topright",
         })
-        .addTo(config.map);
+        .addTo(map);
 
     GPSAdaptor.DataListener((dataGroupByTime) => {
         for (let i in dataGroupByTime) {
@@ -608,7 +610,7 @@ onMounted(() => {
                     addVehicle(id, L.latLng(lat, lng));
                 } else {
                     if (vehicles.move[id].latLngList.length === 2) {
-                        // vehicles.move[id].timer = setInterval(addDynamicLine, config.duration, id);
+                        // vehicles.move[id].timer = setInterval(addDynamicLine, mapConfig.duration, id);
                         motionRender(id);
                         setInterval(() => {
                             if (vehicles.move[id].motion) {

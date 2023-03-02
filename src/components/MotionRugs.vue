@@ -13,7 +13,7 @@ const valueY = ref([1, FILE_COUNT - 30]);
 let valueDraw = false;
 let valueTimer = setInterval(() => {
     valueDraw = true;
-}, 100);
+}, 1000 / 30);
 
 const canvasItem = {
     canvas: null,
@@ -260,12 +260,7 @@ const sliderYHeight = computed(() => {
                                 placeholder="Null"
                                 @change="changeStrategy"
                             >
-                                <el-option
-                                    v-for="item in strategyOptions"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
-                                />
+                                <el-option v-for="item in strategyOptions" :key="item.value" :label="item.label" :value="item.value" />
                             </el-select>
                         </div>
                         <div class="switchs" style="margin-top: 5px">
@@ -329,23 +324,12 @@ const sliderYHeight = computed(() => {
                     <el-main>
                         <!-- <div style="margin-right: 20px"> -->
                         <el-scrollbar element-loading-background="rgba(235,235,235,1)">
-                            <canvas
-                                id="canvas"
-                                @mousedown="getStartPosition"
-                                @mouseup="getEndPosition"
-                                @mousemove="getTempPosition"
-                            ></canvas>
+                            <canvas id="canvas" @mousedown="getStartPosition" @mouseup="getEndPosition" @mousemove="getTempPosition"></canvas>
                         </el-scrollbar>
                         <!-- </div> -->
                     </el-main>
                     <el-footer style="height=10px; margin-right: 30px;">
-                        <el-slider
-                            style="margin-left: 10px; height: 12px"
-                            v-model="valueX"
-                            range
-                            :max="FRAME_LENGTH"
-                            @input="changeRangeX"
-                        />
+                        <el-slider style="margin-left: 10px; height: 12px" v-model="valueX" range :max="FRAME_LENGTH" @input="changeRangeX" />
                     </el-footer>
                 </el-container>
             </el-main>
