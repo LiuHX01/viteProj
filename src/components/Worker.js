@@ -126,10 +126,12 @@ const HilbertCurveStrategy = (unsorted) => {
     for (let x = 0; x < unsorted.length; x++) {
         let idx = new Array(unsorted[x].length);
         let hilbertValues = new Array(unsorted[x].length);
+        // console.time("hilbert");
         for (let y = 0; y < unsorted[x].length; y++) {
             idx[y] = y;
-            hilbertValues[y] = encode(parseInt(unsorted[x][y].latitude * 10000), parseInt(unsorted[x][y].longitude * 10000), 100);
+            hilbertValues[y] = encode(Math.round(unsorted[x][y].latitude * 100), Math.round(unsorted[x][y].longitude * 100), 20000);
         }
+        // console.timeEnd("hilbert");
 
         idx.sort(function cmp(o1, o2) {
             return hilbertValues[o1] - hilbertValues[o2];
@@ -188,7 +190,7 @@ const zOrderCurveStrategy = (unsorted) => {
 
         for (let y = 0; y < unsorted[x].length; y++) {
             idx[y] = y;
-            zValues[y] = encode(parseInt(unsorted[x][y].latitude * 10000), parseInt(unsorted[x][y].longitude * 10000));
+            zValues[y] = encode(Math.round(unsorted[x][y].latitude), Math.round(unsorted[x][y].longitude));
         }
 
         idx.sort((a, b) => zValues[a] - zValues[b]);
@@ -268,7 +270,9 @@ class MotionRugsDataSet {
     // 根据strategy返回一个新的orderedDataSet
     getOrderedData(strategyName) {
         if (strategyName === "Hilbert") {
+            console.time("Hilbert");
             this.orderedDataSet = HilbertCurveStrategy(this.baseData);
+            console.timeEnd("Hilbert");
             return this.orderedDataSet;
         } else if (strategyName === "zOrder") {
             this.orderedDataSet = zOrderCurveStrategy(this.baseData);
