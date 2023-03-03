@@ -129,7 +129,7 @@ const HilbertCurveStrategy = (unsorted) => {
         // console.time("hilbert");
         for (let y = 0; y < unsorted[x].length; y++) {
             idx[y] = y;
-            hilbertValues[y] = encode(Math.round(unsorted[x][y].latitude * 100), Math.round(unsorted[x][y].longitude * 100), 20000);
+            hilbertValues[y] = encode(Math.round(unsorted[x][y].latitude * 10000), Math.round(unsorted[x][y].longitude * 10000), 32);
         }
         // console.timeEnd("hilbert");
 
