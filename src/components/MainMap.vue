@@ -113,11 +113,7 @@ const initMap = (sourceName) => {
                 L.marker(e.latlng, {
                     icon: L.divIcon({
                         className: "my-div-icon",
-                        html: numIcons[
-                            config.trackMarkers.length > numIcons.length - 1
-                                ? numIcons.length - 1
-                                : config.trackMarkers.length - 1
-                        ],
+                        html: numIcons[config.trackMarkers.length > numIcons.length - 1 ? numIcons.length - 1 : config.trackMarkers.length - 1],
                     }),
                 }).addTo(map)
             );
@@ -163,8 +159,7 @@ const addVehicle = (id, initLatLng) => {
 };
 
 const handleSmear = (id) => {
-    vehicles.smear[id].currSmear =
-        vehicles.smear[id].currSmear == 0 ? vehicles.smear[id].smearCount - 1 : vehicles.smear[id].currSmear - 1;
+    vehicles.smear[id].currSmear = vehicles.smear[id].currSmear == 0 ? vehicles.smear[id].smearCount - 1 : vehicles.smear[id].currSmear - 1;
 
     if (vehicles.smear[id].smearList.length < vehicles.smear[id].smearCount) {
         for (let i = vehicles.smear[id].smearList.length; i < vehicles.smear[id].smearCount; i++) {
@@ -297,9 +292,7 @@ const addDynamicLine = (id) => {
                     {
                         removeOnEnd: false,
                         showMarker: true,
-                        icon: vehicles.state[id].locked
-                            ? L.icon({ iconUrl: "/aim.svg", iconSize: [24, 24] })
-                            : vehicles.move[id].icon,
+                        icon: vehicles.state[id].locked ? L.icon({ iconUrl: "/aim.svg", iconSize: [24, 24] }) : vehicles.move[id].icon,
                     }
                 )
                 .addTo(map);

@@ -32,12 +32,16 @@ onmessage = (msg) => {
                 dataSet.getDeciles(currFeature),
                 currFeature
             );
-
             let img = new ImageData(ordered.length, ordered[0].length);
-
+            const ordered2 = dataSet.baseData;
             for (let i = 0; i < ordered.length; i++) {
                 for (let j = 0; j < ordered[i].length; j++) {
-                    const clr = hexColorToRGB(draw.getColor(ordered[i][j]["value"][currFeature]));
+                    let clr;
+                    if (strategyName == "zOrder") {
+                        clr = hexColorToRGB(draw.getColor(ordered[i][j]["value"][currFeature]));
+                    } else {
+                        clr = hexColorToRGB(draw.getColor(ordered[i][j]["value"][currFeature]));
+                    }
                     const idx = 4 * (i + j * ordered.length);
                     img.data[idx] = clr.r;
                     img.data[idx + 1] = clr.g;
@@ -129,7 +133,7 @@ const HilbertCurveStrategy = (unsorted) => {
         // console.time("hilbert");
         for (let y = 0; y < unsorted[x].length; y++) {
             idx[y] = y;
-            hilbertValues[y] = encode(Math.round(unsorted[x][y].latitude * 10000), Math.round(unsorted[x][y].longitude * 10000), 32);
+            hilbertValues[y] = encode(Math.round(unsorted[x][y].latitude * 10000), Math.round(unsorted[x][y].longitude * 10000), 100);
         }
         // console.timeEnd("hilbert");
 
@@ -271,11 +275,15 @@ class MotionRugsDataSet {
     getOrderedData(strategyName) {
         if (strategyName === "Hilbert") {
             console.time("Hilbert");
+            console.log(this.baseData);
             this.orderedDataSet = HilbertCurveStrategy(this.baseData);
+            console.log(this.orderedDataSet);
             console.timeEnd("Hilbert");
             return this.orderedDataSet;
         } else if (strategyName === "zOrder") {
+            console.time("zOrder");
             this.orderedDataSet = zOrderCurveStrategy(this.baseData);
+            console.timeEnd("zOrder");
             return this.orderedDataSet;
         }
     }
